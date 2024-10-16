@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block content %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>{{ user.firstname }}'s Profile</title>
+    <style>
+        .profile-table {
+            width: 50%;
+            margin-top: 20px;
+        }
+        .table-container {
+            margin-left: 5%;
+            margin-top: 2%;
+        }
+    </style>
+</head>
+<body>
+    <div class="table-container">
+        <h1>Hello {{ user.firstname }}!</h1>
+
+        <table class="table profile-table">
+            <thead class="thead-dark">
+                <tr>
+                    <th scope="col">Detail</th>
+                    <th scope="col">Your Info</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr></tr>
+                    <td>Account Number</td>
+                    <td>{{ user.id }}</td>
+                </tr>
+                <tr>
+                    <td>First Name</td>
+                    <td>{{ user.firstname }}
+                        <a href="{{ url_for('users.editInfo')}}"> Edit </a>
+                    </td>
+
+                </tr>
+                <tr>
+                    <td>Last Name</td>
+                    <td>{{ user.lastname }}</td>
+                </tr>
+                <tr>
+                    <td>Email</td>
+                    <td>{{ user.email }}</td>
+                </tr>
+                <tr>
+                    <td>Balance</td>
+                    <td>${{ user.balance }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+</body>
+</html>
+
+{% endblock %}
