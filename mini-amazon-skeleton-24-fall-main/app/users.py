@@ -72,3 +72,8 @@ def register():
 def logout():
     logout_user()
     return redirect(url_for('index.index'))
+
+
+@bp.route('/userpage')
+def user_page():
+    return redirect(url_for('userpage.html'))
