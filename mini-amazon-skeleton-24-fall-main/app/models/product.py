@@ -39,3 +39,22 @@ WHERE seller_id = :seller_id
                               seller_id=seller_id)
         return [Product(*row) for row in rows]
 
+    @staticmethod
+    def list_product(name, seller_id, price):
+        try:
+            rows = app.db.execute("""
+INSERT INTO Products(name, seller_id, price, available)
+VALUES(:name, :seller_id, :price, :available)
+RETURNING id
+""",
+                                  name=name,
+                                  seller_id=seller_id, 
+                                  price = price, 
+                                  available= 'true')
+            id = rows[0][0]
+            return Product.get(id)
+        except Exception as e:
+            # likely email already in use; better error checking and reporting needed;
+            # the following simply prints the error to the console:
+            print(str(e))
+            return None
