@@ -9,14 +9,16 @@ class WishlistItem:
         self.time_added = time_added
 
     @staticmethod
-    def get(id):
+    def get(id, uid):
         rows = app.db.execute('''
 SELECT id, uid, pid, time_added
 FROM Wishes
 WHERE id = :id
+AND uid = :uid
 ''',
-                              id=id)
-        return Wishes(*(rows[0])) if rows else None
+                              id=id,
+                              uid=uid)
+        return WishlistItem(*(rows[0])) if rows else None
 
     @staticmethod
     def wishlistItem(uid, pid, time_added):
@@ -30,9 +32,9 @@ RETURNING id
                                   pid=pid,
                                   time_added=time_added)
             id = rows[0][0]
-            return User.get(id)
+            return WishlistItem.get(id, uid)
         except Exception as e:
-            # likely email already in use; better error checking and reporting needed;
+            # likely item already wishlist; better error checking and reporting needed;
             # the following simply prints the error to the console:
             print(str(e))
             return None
@@ -48,4 +50,4 @@ ORDER BY time_added DESC
 ''',
                               uid=uid,
                               since=since)
-        return [Wishes(*row) for row in rows]
+        return [WishlistItem(*row) for row in rows]
