@@ -4,6 +4,16 @@
 
 <br><br>
 
+<form method="GET" action="">
+  <div class="form-group">
+    <label for="seller_id">Filter by Seller ID:</label>
+    <input type="text" class="form-control" id="seller_id" name="seller_id" placeholder="Enter Seller ID" value="{{ request.args.get('seller_id', '') }}">
+  </div>
+  <button type="submit" class="btn btn-primary">Filter</button>
+  <a href="{{ url_for('index.index') }}" class="btn btn-secondary">Clear Filter</a>
+</form>
+
+
 <h2>Products for sale:</h2>
 <table class='table table-hover table-bordered container'>
   <thead class="thead-dark">
@@ -11,6 +21,7 @@
       <th scope="col">Product ID</th>
       <th scope="col">Product Name</th>
       <th scope="col">Price</th>
+      <th scope="col">Seller ID</th> 
     </tr>
   </thead>
   <tbody>
@@ -19,6 +30,7 @@
         <th scope="row">{{product.id}}</th>
         <td>{{product.name}}</td>
         <td>{{product.price}}</td>
+        <td>{{product.seller_id}}</td>
       </tr>
     {% endfor %}
   </tbody>

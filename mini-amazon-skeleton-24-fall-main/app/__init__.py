@@ -23,5 +23,8 @@ def create_app():
 
     from .wishlist import bp as wishlist_bp
     app.register_blueprint(wishlist_bp)
+    
+    from .sellerpage import bp as seller_bp
+    app.register_blueprint(seller_bp)
 
     return app
