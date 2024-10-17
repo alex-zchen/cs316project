@@ -8,17 +8,19 @@ from .. import login
 
 ##SKELETON: Used User skeleton from mini amazon project to build user class. Specifically used init for the user and the auth functions. 
 class User(UserMixin):
-    def __init__(self, id, email, firstname, lastname, balance = 0):
+    def __init__(self, id, email, firstname, lastname, password, address, balance = 0):
         self.id = id
         self.email = email
         self.firstname = firstname
+        self.address = address
         self.lastname = lastname
-        self.balance = 0
+        self.password = password
+        self.balance = balance
 
     @staticmethod
     def get_by_auth(email, password):
         rows = app.db.execute("""
-        SELECT password, id, email, firstname, lastname
+        SELECT password, id, email, firstname, lastname, address, balance
         FROM Users
         WHERE email = :email
         """, email=email)
@@ -41,16 +43,16 @@ class User(UserMixin):
         return len(rows) > 0
 
     @staticmethod
-    def register(email, password, firstname, lastname):
+    def register(email, password, firstname, lastname, address, balance):
         try:
             rows = app.db.execute("""
-            INSERT INTO Users(email, password, firstname, lastname)
-            VALUES(:email, :password, :firstname, :lastname)
+            INSERT INTO Users(email, password, firstname, lastname, address, balance)
+            VALUES(:email, :password, :firstname, :lastname, :address, :balance)
             RETURNING id
             """,
             email=email,
             password=generate_password_hash(password),
-            firstname=firstname, lastname=lastname)
+            firstname=firstname, lastname=lastname, address = address, balance = balance)
 
             id = rows[0][0]
             return User.get(id)
@@ -60,14 +62,14 @@ class User(UserMixin):
             print(str(e))
             return None
     @staticmethod
-    def update_info(id, email, firstname, lastname, balance):
+    def update_info(id, email, password, firstname, lastname, address, balance):
         try:
             app.db.execute("""
             UPDATE Users
-            SET email = :email, firstname = :firstname, lastname = :lastname, balance = :balance
+            SET email = :email, firstname = :firstname, lastname = :lastname, address = :address, balance = :balance, password = :password, address = :address
             WHERE id = :id
             """, 
-            id=id, email=email, firstname=firstname, lastname=lastname, balance = balance)
+            id=id, email=email, address = address, firstname=firstname, lastname=lastname, balance = balance, password = password)
             return True
         except Exception as e:
             print(str(e))
@@ -77,7 +79,7 @@ class User(UserMixin):
     @login.user_loader
     def get(id):
         rows = app.db.execute("""
-        SELECT id, email, firstname, lastname, balance
+        SELECT id, email, firstname, lastname, balance, password, address
         FROM Users
         WHERE id = :id
         """,

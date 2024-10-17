@@ -6,6 +6,7 @@ CREATE TABLE Users (
     email VARCHAR UNIQUE NOT NULL,
     balance NUMERIC DEFAULT 0,
     password VARCHAR(255) NOT NULL,
+    address VARCHAR(255) NOT NULL,
     firstname VARCHAR(255) NOT NULL,
     lastname VARCHAR(255) NOT NULL
 );
