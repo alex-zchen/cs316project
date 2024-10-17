@@ -9,18 +9,6 @@ class WishlistItem:
         self.time_added = time_added
 
     @staticmethod
-    def get(id, uid):
-        rows = app.db.execute('''
-SELECT id, uid, pid, time_added
-FROM Wishes
-WHERE id = :id
-AND uid = :uid
-''',
-                              id=id,
-                              uid=uid)
-        return WishlistItem(*(rows[0])) if rows else None
-
-    @staticmethod
     def wishlistItem(uid, pid, time_added):
         try:
             rows = app.db.execute("""

@@ -7,7 +7,8 @@
 <form method="GET" action="">
   <div class="form-group">
     <label for="seller_id">Filter by Seller ID:</label>
-    <input type="text" class="form-control" id="seller_id" name="seller_id" placeholder="Enter Seller ID" value="{{ request.args.get('seller_id', '') }}">
+    <input type="text" class="form-control" id="seller_id" name="seller_id" placeholder="Enter Seller ID"
+      value="{{ request.args.get('seller_id', '') }}">
   </div>
   <button type="submit" class="btn btn-primary">Filter</button>
   <a href="{{ url_for('index.index') }}" class="btn btn-secondary">Clear Filter</a>
@@ -21,17 +22,17 @@
       <th scope="col">Product ID</th>
       <th scope="col">Product Name</th>
       <th scope="col">Price</th>
-      <th scope="col">Seller ID</th> 
+      <th scope="col">Seller ID</th>
     </tr>
   </thead>
   <tbody>
     {% for product in avail_products%}
-      <tr>
-        <th scope="row">{{product.id}}</th>
-        <td>{{product.name}}</td>
-        <td>{{product.price}}</td>
-        <td>{{product.seller_id}}</td>
-      </tr>
+    <tr>
+      <th scope="row">{{product.id}}</th>
+      <td>{{product.name}}</td>
+      <td>{{product.price}}</td>
+      <td>{{product.seller_id}}</td>
+    </tr>
     {% endfor %}
   </tbody>
 </table>
@@ -49,16 +50,13 @@
   </thead>
   <tbody>
     {% for purchase in purchase_history%}
-      <tr>
-        <th scope="row">{{purchase.id}}</th>
-        <td>{{purchase.pid}}</td>
-        <td>{{purchase.time_purchased}}</td>
-      </tr>
+    <tr>
+      <th scope="row">{{purchase.id}}</th>
+      <td>{{purchase.pid}}</td>
+      <td>{{purchase.time_purchased}}</td>
+    </tr>
     {% endfor %}
   </tbody>
 </table>
-{% else %}
-<p><a href="{{ url_for('users.login') }}">Log in</a> to see your purchase history!</p>
-{% endif %}
 
 {% endblock %}
