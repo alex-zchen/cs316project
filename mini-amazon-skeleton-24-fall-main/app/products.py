@@ -37,4 +37,3 @@ def searchproduct(id):
         })
     return jsonify({'error': 'Product not found'}), 404
 
-# You can remove the separate top_expensive route as it's now handled in listproduct
