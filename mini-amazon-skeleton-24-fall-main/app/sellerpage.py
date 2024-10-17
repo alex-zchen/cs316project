@@ -33,7 +33,7 @@ def seller():
             return redirect(url_for('sellerpage.seller'))
     # find the products current user has listed:
     if current_user.is_authenticated:
-        products_in_inventory = Product.get_seller_all(
+        products_in_inventory = Product.filter_by(
             current_user.id)
     # render the page by adding information to the seller.html file
     return render_template('seller.html',
