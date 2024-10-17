@@ -11,10 +11,17 @@ bp = Blueprint('index', __name__)
 @bp.route('/')
 def index():
     seller_id = request.args.get('seller_id')
-
-    if seller_id:
+    top_k = request.args.get('top_k')
+    if seller_id and top_k:
         seller_id = int(seller_id)
-        products = Product.get_seller_all(seller_id)
+        top_k = int(top_k)
+        products = Product.filter_by(seller_id, top_k)
+    elif seller_id:
+        seller_id = int(seller_id)
+        products = Product.filter_by(seller_id)
+    elif top_k:
+        top_k = int(top_k)
+        products = Product.filter_by(None, top_k)
     else:
         products = Product.get_all(True)
     # find the products current user has bought:

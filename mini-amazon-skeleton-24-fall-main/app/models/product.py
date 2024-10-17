@@ -30,14 +30,26 @@ WHERE available = :available
         return [Product(*row) for row in rows]
 
     @staticmethod 
-    def get_seller_all(seller_id):
-        rows = app.db.execute('''
-SELECT id, name, seller_id, price, available
-FROM Products
-WHERE seller_id = :seller_id
-''',
-                              seller_id=seller_id)
-        return [Product(*row) for row in rows]
+    def filter_by(seller_id, k = 100):
+        if seller_id:
+            rows = app.db.execute('''
+    SELECT id, name, seller_id, price, available
+    FROM Products
+    WHERE seller_id = :seller_id
+    ORDER BY price DESC
+    LIMIT :k
+    ''',
+                                seller_id=seller_id, k = k)
+            return [Product(*row) for row in rows]
+        else:
+            rows = app.db.execute('''
+    SELECT id, name, seller_id, price, available
+    FROM Products
+    ORDER BY price DESC
+    LIMIT :k
+    ''',
+                                k = k)
+            return [Product(*row) for row in rows]
 
     @staticmethod
     def list_product(name, seller_id, price):
