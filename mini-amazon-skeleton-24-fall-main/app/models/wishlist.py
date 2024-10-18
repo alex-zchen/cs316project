@@ -9,6 +9,16 @@ class WishlistItem:
         self.time_added = time_added
 
     @staticmethod
+    def get(id):
+        rows = app.db.execute("""
+SELECT id, uid, pid, time_added
+FROM Wishes
+WHERE id = :id
+""",
+                              id=id)
+        return User(*(rows[0])) if rows else None
+
+    @staticmethod
     def wishlistItem(uid, pid, time_added):
         try:
             rows = app.db.execute("""
@@ -20,7 +30,7 @@ RETURNING id
                                   pid=pid,
                                   time_added=time_added)
             id = rows[0][0]
-            return WishlistItem.get(id, uid)
+            return WishlistItem.get(id)
         except Exception as e:
             # likely item already wishlist; better error checking and reporting needed;
             # the following simply prints the error to the console:
