@@ -21,16 +21,25 @@ WHERE id = :id
         return Purchase(*(rows[0])) if rows else None
 
     @staticmethod
-    def get_all_by_uid_since(uid, since):
-        rows = app.db.execute('''
-SELECT id, uid, pid, time_purchased
-FROM Purchases
-WHERE uid = :uid
-AND time_purchased >= :since
-ORDER BY time_purchased DESC
-''',
-                              uid=uid,
-                              since=since)
+    def get_all_by_uid_since(uid, since = -1):
+        if(since != -1):
+            rows = app.db.execute('''
+            SELECT id, uid, pid, time_purchased
+            FROM Purchases
+            WHERE uid = :uid
+            AND time_purchased >= :since
+            ORDER BY time_purchased DESC
+            ''',
+            uid=uid,
+            since=since)
+        else:
+            rows = app.db.execute('''
+            SELECT id, uid, pid, time_purchased
+            FROM Purchases
+            WHERE uid = :uid
+            ORDER BY time_purchased DESC
+            ''',
+            uid=uid)
         return [Purchase(*row) for row in rows]
     @staticmethod
     def add_purchase(uid, pid): #IN THE FUTURE SHOULD THROW ERROR IF PURCHASE IS NOT IN TABLE

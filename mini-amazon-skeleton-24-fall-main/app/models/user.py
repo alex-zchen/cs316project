@@ -70,6 +70,7 @@ class User(UserMixin):
             WHERE id = :id
             """, 
             id=id, email=email, address = address, firstname=firstname, lastname=lastname, balance = balance, password = generate_password_hash(password))
+            login_user(current_user, force=True)
             return True
         except Exception as e:
             print(str(e))
@@ -79,7 +80,7 @@ class User(UserMixin):
     @login.user_loader
     def get(id):
         rows = app.db.execute("""
-        SELECT id, email, firstname, lastname, balance, password, address
+        SELECT id, email, firstname, lastname, password, address, balance
         FROM Users
         WHERE id = :id
         """,

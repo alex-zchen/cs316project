@@ -6,7 +6,8 @@ from wtforms import StringField, PasswordField, BooleanField, SubmitField, Decim
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo
 
 from .models.user import User
-
+from .models.purchase import Purchase
+from .models.product import Product
 
 from flask import Blueprint
 bp = Blueprint('users', __name__)
@@ -77,7 +78,18 @@ def updateInfo():
 @bp.route("/profile", methods=["GET"]) 
 def profileDisplay():
     user = current_user
-    return render_template('profile.html', user=user)
+    purchases = Purchase.get_all_by_uid_since(uid = user.id, since = -1)
+    print(user.id)
+    productPurchases = []
+    for purchase in purchases:
+        product = Product.get(purchase.pid)
+        purchaseObj = {}
+        purchaseObj['PurchaseDate'] = purchase.time_purchased
+        purchaseObj["ProductName"] = product.name
+        purchaseObj['Amount Paid'] = product.price
+        purchaseObj['Fufillment Status'] = "Not yet shipped"
+        productPurchases.append(purchaseObj)
+    return render_template('profile.html', user=user, purchases=productPurchases)
 
 @bp.route('/login', methods=['GET', 'POST'])
 def login():
@@ -137,3 +149,12 @@ def logout():
 @bp.route('/userpage')
 def user_page():
     return redirect(url_for('userpage.html'))
+
+@bp.route('/updateBalanceOnPurchase', methods = ["GET", "POST"])
+def update_balance_on_purchase():
+    requestedChange = request.get('balanceChange')
+    if(current_user.balance >= balanceChange):
+        current_user.balance = current_user.balance - balanceChange
+        return True
+    else:
+        return False

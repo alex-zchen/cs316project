@@ -48,9 +48,41 @@
                     <td>{{ user.email }}</td>
                 </tr>
                 <tr>
+                    <td>Address</td>
+                    <td>{{ user.address }}</td>
+                </tr>
+                <tr>
                     <td>Balance</td>
                     <td>${{ user.balance }}</td>
                 </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="purchases-section">
+        <h2>Your Purchases</h2>
+            <thead>
+                {% if purchases %}
+                <tr>
+                    <th>Product Name</th>
+                    <th>Purchase Date</th>
+                    <th>Amount Paid</th>
+                    <th>Fulfillment Status</th>
+                </tr>
+                {% endif %}
+            </thead>
+            <tbody>
+                {% for purchase in purchases %}
+                <tr>
+                    <td>{{ purchase.ProductName }}</td>
+                    <td>{{ purchase.PurchaseDate }}</td>
+                    <td>${{ purchase["Amount Paid"] }}</td>
+                    <td>{{ purchase["Fufillment Status"] }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="4">No purchases found.</td>
+                </tr>
+                {% endfor %}
             </tbody>
         </table>
     </div>
