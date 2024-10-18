@@ -56,6 +56,8 @@
           <a href="{{ url_for('users.profileDisplay') }}" type="button" class="btn btn-light">
             <i class="fa fa-home"></i> Home
           </a>
+        <a href="{{ url_for('sellerpage.seller') }}" class="btn btn-secondary">Go to Your Seller Page</a>
+      
         {% else %}
           <a href="{{ url_for('users.login') }}" type="button" class="btn btn-light">Log in</a>
         {% endif %}
