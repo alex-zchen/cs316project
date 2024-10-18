@@ -73,7 +73,19 @@ def updateInfo():
     current_user.balance = balance if balance else current_user.balance
     current_user.update_info(id = current_user.id, email = current_user.email, firstname = current_user.firstname, lastname = current_user.lastname, balance = current_user.balance, password = current_user.password, address = current_user.address)
     login()
-    return render_template('profile.html', user = current_user)
+    user = current_user
+    purchases = Purchase.get_all_by_uid_since(uid = user.id, since = -1)
+    print(user.id)
+    productPurchases = []
+    for purchase in purchases:
+        product = Product.get(purchase.pid)
+        purchaseObj = {}
+        purchaseObj['PurchaseDate'] = purchase.time_purchased
+        purchaseObj["ProductName"] = product.name
+        purchaseObj['Amount Paid'] = product.price
+        purchaseObj['Fufillment Status'] = "Not yet shipped"
+        productPurchases.append(purchaseObj)
+    return render_template('profile.html', user = current_user, purchases = productPurchases)
 
 @bp.route("/profile", methods=["GET"]) 
 def profileDisplay():

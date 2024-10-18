@@ -54,7 +54,7 @@
         {% if current_user.is_authenticated %}
           Hello {{current_user.firstname}}! <a href="{{ url_for('users.logout') }}" type="button" class="btn btn-light">Log out</a>
           <a href="{{ url_for('users.profileDisplay') }}" type="button" class="btn btn-light">
-            <i class="fa fa-home"></i> Home
+            <i class="fa fa-user"></i> Profile
           </a>
         <a href="{{ url_for('sellerpage.seller') }}" class="btn btn-secondary">Go to Your Seller Page</a>
         {% else %}
