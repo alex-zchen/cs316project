@@ -66,10 +66,10 @@ class User(UserMixin):
         try:
             app.db.execute("""
             UPDATE Users
-            SET email = :email, firstname = :firstname, lastname = :lastname, address = :address, balance = :balance, password = :password, address = :address
+            SET email = :email, firstname = :firstname, lastname = :lastname, address = :address, balance = :balance, password = :password
             WHERE id = :id
             """, 
-            id=id, email=email, address = address, firstname=firstname, lastname=lastname, balance = balance, password = password)
+            id=id, email=email, address = address, firstname=firstname, lastname=lastname, balance = balance, password = generate_password_hash(password))
             return True
         except Exception as e:
             print(str(e))

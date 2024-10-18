@@ -20,7 +20,7 @@ class LoginForm(FlaskForm):
 
 class UpdateInfoForm(FlaskForm):
     email = StringField('Email')
-    address = StringField('Password')
+    address = StringField('Address')
     password = PasswordField('Password')
     fname = StringField('First Name')
     lname = StringField('Last Name')
@@ -52,8 +52,13 @@ def updateInfo():
         address = None
     try:
         password = request.form.get('password')
+        if password:
+            password = generate_password_hash(password)
+        else:
+            password = current_user.password  
     except:
-        password = None
+        password = current_user.password
+
     try:
         balance = request.form.get('balance')
     except:
@@ -115,10 +120,10 @@ def register():
         return redirect(url_for('index.index'))
     form = RegistrationForm()
     if form.validate_on_submit():
-        if User.register(form.email.data,
-                         form.password.data,
-                         form.firstname.data,
-                         form.lastname.data, address = form.address.data, balance = 0):
+        if User.register(email = form.email.data,
+                         password = form.password.data,
+                         firstname = form.firstname.data,
+                         lastname = form.lastname.data, address = form.address.data, balance = 0):
             flash('Congratulations, you are now a registered user!')
             return redirect(url_for('users.login'))
     return render_template('register.html', title='Register', form=form)
