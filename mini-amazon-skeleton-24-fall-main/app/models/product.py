@@ -40,7 +40,7 @@ WHERE available = :available
     LIMIT :k
     ''',
                                 seller_id=seller_id, k = k)
-            return [Product(*row) for row in rows]
+            return [Product(*row) for row in rows] if rows is not None else None
         else:
             rows = app.db.execute('''
     SELECT id, name, seller_id, price, available

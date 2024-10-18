@@ -42,12 +42,24 @@
 
 <br><br>
 {% if current_user.is_authenticated %}
+<form action="" method="post">
+  {{ form.hidden_tag() }}
+  <p>
+    {{ form.pid.label }}<br/>
+    {{ form.pid(size=32) }}<br/>
+    {% for error in form.pid.errors %}
+    <span style="color: red;">[{{ error }}]</span>
+    {% endfor %}
+  </p>
+  <p>{{ form.submit() }}</p>
+</form>
+
 <h2>Your recent purchases:</h2>
 <table class='table table-hover table-bordered container'>
   <thead class="thead-dark">
     <tr>
       <th scope="col">Purchase ID</th>
-      <th scope="col">Product Name</th>
+      <th scope="col">Product ID</th>
       <th scope="col">Price</th>
     </tr>
   </thead>

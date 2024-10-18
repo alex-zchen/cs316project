@@ -29,7 +29,6 @@ def seller():
         if Product.list_product(
             form.product_name.data, current_user.id, form.price.data
         ):
-            flash('Product Successfully Listed!')
             return redirect(url_for('sellerpage.seller'))
     # find the products current user has listed:
     if current_user.is_authenticated:
