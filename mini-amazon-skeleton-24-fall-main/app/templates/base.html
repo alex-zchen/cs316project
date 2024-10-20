@@ -9,38 +9,38 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='css/example.css') }}">
   <style>
     body {
-        font-family: "Lato", sans-serif;
+      font-family: "Lato", sans-serif;
     }
 
     .main-head {
-        height: 150px;
-        background: #FFF;
+      height: 150px;
+      background: #FFF;
     }
 
     .sidenav {
-        height: 100%;
-        background-color: #000;
-        overflow-x: hidden;
-        padding-top: 20px;
+      height: 100%;
+      background-color: #000;
+      overflow-x: hidden;
+      padding-top: 20px;
     }
 
     .main {
-        padding: 0px 10px;
+      padding: 0px 10px;
     }
 
     .login-main-text {
-        margin-top: 20%;
-        padding: 60px;
-        color: #fff;
+      margin-top: 20%;
+      padding: 60px;
+      color: #fff;
     }
 
     .login-main-text h2 {
-        font-weight: 300;
+      font-weight: 300;
     }
 
     .btn-black {
-        background-color: #000 !important;
-        color: #fff;
+      background-color: #000 !important;
+      color: #fff;
     }
   </style>
 </head>
@@ -48,15 +48,18 @@
 <body>
   <div class="sidenav">
     {% block msg %}
-      <h1 style="color:aliceblue">Welcome to CompSci 316 Mini Amazon!</h1>
-      <div style="color: aliceblue; text-align: right; margin-bottom: 25px">
-        {% if current_user.is_authenticated %}
-          Hello {{current_user.firstname}}! <a href="{{ url_for('sellerpage.seller') }}" class="btn btn-secondary">Go to Your Seller Page</a>
-          <a href="{{ url_for('users.logout') }}" type="button" class="btn btn-light">Log out</a>
-        {% else %}
-          <a href="{{ url_for('users.login') }}" type="button" class="btn btn-light">Log in</a>
-        {% endif %}
-      </div>
+    <h1 style="color:aliceblue">Welcome to CompSci 316 Mini Amazon!</h1>
+    <div style="color: aliceblue; text-align: right; margin-bottom: 25px">
+      {% if current_user.is_authenticated %}
+      Hello {{current_user.firstname}}! <a href="{{ url_for('sellerpage.seller') }}" class="btn btn-secondary">Go to
+        Your Seller Page</a>
+      <a href="{{ url_for('sellerreviewpage.sellerreviewbackend') }}" class="btn btn-secondary">Go to review
+        Page</a>
+      <a href="{{ url_for('users.logout') }}" type="button" class="btn btn-light">Log out</a>
+      {% else %}
+      <a href="{{ url_for('users.login') }}" type="button" class="btn btn-light">Log in</a>
+      {% endif %}
+    </div>
     {% endblock %}
   </div>
   <div class="main">
