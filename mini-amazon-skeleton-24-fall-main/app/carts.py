@@ -14,6 +14,7 @@ bp = Blueprint('carts', __name__)
 def carts():
     # userid
     user_cart = {}
+    userid = current_user.id
     # find total price and cart:
     if(current_user.is_authenticated):
         user_cart = Cart.get(userid)
