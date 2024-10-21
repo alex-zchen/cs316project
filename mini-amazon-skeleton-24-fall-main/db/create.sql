@@ -26,3 +26,10 @@ CREATE TABLE Purchases (
     time_purchased timestamp without time zone NOT NULL DEFAULT (current_timestamp AT TIME ZONE 'UTC')
 );
 
+CREATE TABLE Cart (
+    uid INT,
+    pid INT NOT NULL REFERENCES Products(id),
+    quant INT NOT NULL,
+    FOREIGN KEY (uid) REFERENCES Users(id)
+);
+
