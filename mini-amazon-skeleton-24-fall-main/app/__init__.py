@@ -30,6 +30,9 @@ def create_app():
     from .sellerreviewpage import bp as sellerreviewing_bp
     app.register_blueprint(sellerreviewing_bp)
 
+    from .carts import bp as cart_bp
+    app.register_blueprint(cart_bp)
+
     from .sellerpage import bp as seller_bp
     app.register_blueprint(seller_bp)
 
