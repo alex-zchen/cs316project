@@ -15,7 +15,7 @@ Since Milestone 2 required us to map out our project, all group members sat toge
 Independently, each group member set up the skeleton code to run in their own environment. 
 
 ### Milestone 3: 
-Our Youtube demonstration video can be found here:
+Our Youtube demonstration video can be found here: https://youtu.be/gsRyjW3mfE4
 
 Changes can be seen here in the following files: create.sql, load.sql, carts.py, index.py, productreviewpage.py, sellerpage.py, sellerviewpage.py, users.py, wishlist.py, templates/base.html, templates/carts.html, templates/changeUserDetailForm.html, templates/index.html, templates/login.html, templates/productreveiw.html, templates/profile.html, templates/register.html, templates/seller.html, templates/sellerreview.html, templates/wishlist.html, models/cart.py, models/product.py, models/productreview.py, models/purchase.py, models/sellerreview.py, models/user.py, models.wishlist.py
 
