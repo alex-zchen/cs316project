@@ -23,7 +23,7 @@ class Cart:
 
     @staticmethod
     def isEmpty(uid):
-        if Cart.get(current_user.id) is {}:
+        if Cart.get(current_user.id) == {}:
             return True
         else: return False
     
