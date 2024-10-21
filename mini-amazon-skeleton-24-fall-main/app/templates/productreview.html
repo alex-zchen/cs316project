@@ -7,12 +7,12 @@
 
 <form method="GET" action="">
     <div class="form-group">
-        <label for="seller_id">Filter by Seller ID:</label>
-        <input type="text" class="form-control" id="seller_id" name="seller_id" placeholder="Enter Seller ID"
-            value="{{ request.args.get('seller_id', '') }}">
+        <label for="product_id">Filter by Product ID:</label>
+        <input type="text" class="form-control" id="product_id" name="product_id" placeholder="Enter Product ID"
+            value="{{ request.args.get('Product_id', '') }}">
     </div>
     <button type="submit" class="btn btn-primary">Filter</button>
-    <a href="{{ url_for('sellerreviewpage.sellerreviewpagebackend') }}" class="btn btn-secondary">Clear Filter</a>
+    <a href="{{ url_for('productreviewpage.productreviewpagebackend') }}" class="btn btn-secondary">Clear Filter</a>
 </form>
 <br><br>
 
@@ -20,7 +20,7 @@
 <table class='table table-hover table-bordered container'>
     <thead class="thead-dark">
         <tr>
-            <th scope="col">Seller ID</th>
+            <th scope="col">Product ID</th>
             <th scope="col">Review Score</th>
             <th scope="col">When Added</th>
             <th scope="col">Delete?</th>
@@ -28,18 +28,18 @@
         </tr>
     </thead>
     <tbody>
-        {% for review in sreviews%}
+        {% for review in previews%}
         <tr>
-            <td>{{review.sid}}</td>
+            <td>{{review.pid}}</td>
             <td>{{review.rscore}}</td>
             <td>{{humanize_time(review.time_reviewed)}}</td>
             <td>
-                <form action="{{ url_for('sellerreviewpage.seller_delete', seller_id=review.sid) }}" method="POST">
+                <form action="{{ url_for('productreviewpage.product_delete', product_id=review.pid) }}" method="POST">
                     <input type="submit" value="Delete" />
                 </form>
             </td>
             <td>
-                <form action="{{ url_for('sellerreviewpage.seller_change', seller_id=review.sid) }}" method="POST">
+                <form action="{{ url_for('productreviewpage.product_change', product_id=review.pid) }}" method="POST">
                     <p>
                         {{ form.rscore(size=32) }}<br />
                         {% for error in form.rscore.errors %}
@@ -58,9 +58,9 @@
 <form action="" method="post">
     {{ form.hidden_tag() }}
     <p>
-        {{ form.seller_name.label }}<br />
-        {{ form.seller_name(size=32) }}<br />
-        {% for error in form.seller_name.errors %}
+        {{ form.product_name.label }}<br />
+        {{ form.product_name(size=32) }}<br />
+        {% for error in form.product_name.errors %}
         <span style="color: red;">[{{ error }}]</span>
         {% endfor %}
     </p>

@@ -10,55 +10,70 @@ from flask_login import login_user, logout_user, current_user
 from flask_wtf import FlaskForm
 from wtforms import StringField, IntegerField, BooleanField, SubmitField
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo
-from .models.sellerreview import SellerReview
+from .models.sellerreview import SellerReviewReview
+from datetime import datetime
 
 from humanize import naturaltime
 def humanize_time(dt):
-    return naturaltime(datetime.datetime.now() - dt)
+    return naturaltime(datetime.now() - dt)
 
 from flask import Blueprint
 bp = Blueprint('sellerreviewpage', __name__)
 
-class ReviewForm(FlaskForm):
+class SellerReviewForm(FlaskForm):
+    seller_name = IntegerField('Seller ID', validators=[DataRequired()])
     rscore = IntegerField('Review Score', validators=[DataRequired()])
     submit = SubmitField('List Review')
 
+class ChangeReviewForm(FlaskForm):
+    rscore = IntegerField('Change Score (1-5)', validators=[DataRequired()])
+
 @bp.route('/sellerreviewpage', methods=['GET', 'POST'])
-def sellerreview():
+def sellerreviewpagebackend():
     seller_id = request.args.get('seller_id')
-    form = ReviewForm()
+    form = SellerReviewForm()
     if form.validate_on_submit():
-        if (form.rscore.data>=0 and form.rscore.data<=5) and
-                    SellerReview.find_seller(seller_id):
-            if SellerReview.reviewSeller(current_user.id, 
-                            form.seller_name.data, form.rscore.data, 
-                            datetime.datetime.now()):
-                flash('Review Successfully Posted!')
-                return redirect(url_for('sellerreviewpage.sellerreview'))
-        else: 
-            flash('Review Unsuccessfully Posted!')
-            return redirect(url_for('sellerreviewpage.sellerreview'))
+        if current_user.is_authenticated:
+            if (form.rscore.data>=0 and form.rscore.data<=5) and (len(SellerReviewReview.check_by_uid_for_sid(current_user.id, form.seller_name.data)) ==0):
+                if SellerReviewReview.reviewSeller(current_user.id, 
+                                form.seller_name.data, form.rscore.data, 
+                                datetime.now()):
+                    print('Review Successfully Posted!')
+                    return redirect(url_for('sellerreviewpage.sellerreviewpagebackend'))
+            else: 
+                print('Review Unsuccessfully Posted!')
+                return redirect(url_for('sellerreviewpage.sellerreviewpagebackend'))
     # find the products current user has listed:
     if current_user.is_authenticated:
         if seller_id:
             sid = int(seller_id)
-            sreviews = SellerReview.get_all_by_uid_sid(current_user.id, sid)
+            sreviews = SellerReviewReview.get_all_by_uid_for_sid(current_user.id, sid)
         else:
-            sreviews = SellerReview.get_all_by_uid_since(current_user.id, 
-                                datetime.datetime(1980, 9, 14, 0, 0, 0))
+            sreviews = SellerReviewReview.get_all_by_uid(current_user.id)
     else:
         sreviews = None
     # render the page by adding information to the sellerreview.html file
     return render_template('sellerreview.html',
                             sreviews=sreviews,
-                            humanize_time=humanize_time)
+                            humanize_time=humanize_time,
+                            form=form)
 
-
-@bp.route('/sellerreviewpage/summary', methods=['GET'])
-def sellerreview_add(seller_id):
+@bp.route('/sellerreviewpage/delete/<int:seller_id>', methods=['POST'])
+def seller_delete(seller_id):
     if current_user.is_authenticated:
-        ids = SellerReview.reviewSeller(
-            current_user.id, seller_id, datetime.datetime.now())
-        return redirect(url_for('wishlist.wishlist'))
+        SellerReviewReview.delete_seller_id(current_user.id, seller_id)
+        return redirect(url_for('sellerreviewpage.sellerreviewpagebackend'))
     else:
         return jsonfiy({}), 404
+
+
+@bp.route('/sellerreviewpage/change/<int:seller_id>', methods=['POST'])
+def seller_change(seller_id):
+    form = ChangeReviewForm()
+    if current_user.is_authenticated:
+        if (form.rscore.data>=0 and form.rscore.data<=5):
+            SellerReviewReview.update_rscore(current_user.id, seller_id, form.rscore.data, datetime.now())
+    else:
+        return jsonfiy({}), 404
+    
+    return redirect(url_for('sellerreviewpage.sellerreviewpagebackend'))

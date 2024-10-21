@@ -53,8 +53,6 @@
       {% if current_user.is_authenticated %}
       Hello {{current_user.firstname}}! <a href="{{ url_for('sellerpage.seller') }}" class="btn btn-secondary">Go to
         Your Seller Page</a>
-      <a href="{{ url_for('sellerreviewpage.sellerreviewbackend') }}" class="btn btn-secondary">Go to review
-        Page</a>
       <a href="{{ url_for('users.logout') }}" type="button" class="btn btn-light">Log out</a>
       {% else %}
       <a href="{{ url_for('users.login') }}" type="button" class="btn btn-light">Log in</a>
