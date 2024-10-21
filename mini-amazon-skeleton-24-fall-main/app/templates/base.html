@@ -49,8 +49,10 @@
 <body>
   <div class="sidenav">
     {% block msg %}
-      <h1 style="color:aliceblue">Bannana Pudding Bazaar</h1>
-      <div style="color: aliceblue; text-align: right; margin-bottom: 25px">
+        <a href="{{ url_for('index.index') }}" class="btn btn-black">
+          <h1>Banana Pudding Bazaar</h1>
+        </a>
+          <div style="color: aliceblue; text-align: right; margin-bottom: 25px">
         {% if current_user.is_authenticated %}
           Hello {{current_user.firstname}}! <a href="{{ url_for('users.logout') }}" type="button" class="btn btn-light">Log out</a>
           <a href="{{ url_for('users.profileDisplay') }}" type="button" class="btn btn-light">

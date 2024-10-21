@@ -24,7 +24,7 @@
             <thead class="thead-dark">
                 <tr>
                     <th scope="col">Detail</th>
-                    <th scope="col">Your Info</th>
+                    <th scope="col">Your Info <a href="{{ url_for('users.editInfo')}}"> Edit </a> </th>
                 </tr>
             </thead>
             <tbody>
@@ -35,7 +35,6 @@
                 <tr>
                     <td>First Name</td>
                     <td>{{ user.firstname }}
-                        <a href="{{ url_for('users.editInfo')}}"> Edit </a>
                     </td>
 
                 </tr>
@@ -80,7 +79,7 @@
                 </tr>
                 {% else %}
                 <tr>
-                    <td colspan="4">No purchases found.</td>
+                    <td>No purchases found.</td>
                 </tr>
                 {% endfor %}
             </tbody>

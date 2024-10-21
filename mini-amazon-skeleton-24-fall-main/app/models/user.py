@@ -6,7 +6,8 @@ from .. import login
 
 
 
-##SKELETON: Used User skeleton from mini amazon project to build user class. Specifically used init for the user and the auth functions. 
+##SKELETON: Used User skeleton from mini amazon project to build user class. Specifically used init, get, get_by_auth and email exists. Used register as inspiration using new 
+#account setup with balance and address
 class User(UserMixin):
     def __init__(self, id, email, firstname, lastname, password, address, balance = 0):
         self.id = id
@@ -28,6 +29,7 @@ class User(UserMixin):
             return None
         elif not check_password_hash(rows[0][0], password):
             # incorrect password
+            print(rows[0][0])
             return None
         else:
             return User(*(rows[0][1:]))
@@ -41,6 +43,7 @@ class User(UserMixin):
         """,
                               email=email)
         return len(rows) > 0
+
 
     @staticmethod
     def register(email, password, firstname, lastname, address, balance):
@@ -70,7 +73,7 @@ class User(UserMixin):
             WHERE id = :id
             """, 
             id=id, email=email, address = address, firstname=firstname, lastname=lastname, balance = balance, password = generate_password_hash(password))
-            login_user(current_user, force=True)
+            login_user(get(id), force=True)
             return True
         except Exception as e:
             print(str(e))
