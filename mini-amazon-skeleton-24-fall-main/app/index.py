@@ -3,6 +3,7 @@ from flask_login import current_user
 from datetime import datetime
 from flask import jsonify
 from .models.product import Product
+from .models.cart import Cart
 from flask import Blueprint
 from flask_wtf import FlaskForm
 from flask import render_template, redirect, url_for, flash, request
@@ -20,7 +21,7 @@ bp = Blueprint('index', __name__)
 
 class PurchaseForm(FlaskForm):
     pid = IntegerField('Product ID (NOT NAME!)', validators=[DataRequired()])
-    submit = SubmitField('Purchase!')
+    submit = SubmitField('ADD TO CART')
 
 @bp.route('/', methods=['GET', 'POST'])
 def index():
@@ -41,8 +42,8 @@ def index():
 
     form = PurchaseForm()
     if form.validate_on_submit():
-        if Purchase.add_purchase(
-            current_user.id, form.pid.data
+        if Cart.addCart(
+            current_user.id, form.pid.data, 1
         ):
             return redirect(url_for('index.index'))
 

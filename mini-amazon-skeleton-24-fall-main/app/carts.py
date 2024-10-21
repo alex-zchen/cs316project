@@ -14,7 +14,6 @@ bp = Blueprint('carts', __name__)
 def carts():
     # userid
     user_cart = {}
-    userid = current_user.id
     # find total price and cart:
     if(current_user.is_authenticated):
         user_cart = Cart.get(userid)
@@ -30,7 +29,10 @@ def carts():
         
         return redirect(url_for('carts.carts'))
 
+
     # render the page by adding information to the index.html file
     return render_template('carts.html',
                            ucart=user_cart,
-                           total=total_price)
+                           total=total_price, 
+                           prices = [Product.get(i.pid).price for i in user_cart], 
+                           length = len(user_cart))
