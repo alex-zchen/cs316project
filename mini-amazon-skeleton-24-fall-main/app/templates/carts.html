@@ -37,6 +37,13 @@
     </tr>
   </tbody>
 </table>
+
+<!-- Form for moving cart items to purchases -->
+  <form action="{{ url_for('carts.carts') }}" method="POST" class="mt-3">
+    <button type="submit" class="btn btn-primary">
+      Buy Items!
+    </button>
+  </form>
 {% else %}
 <p><a href="{{ url_for('users.login') }}">Log in</a> to see your purchase history!</p>
 {% endif %}
