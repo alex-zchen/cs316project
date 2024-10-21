@@ -17,7 +17,7 @@ class Cart:
         ''',
         uid=uid)
         if len(rows) > 0: 
-            return Cart(*(rows[0])) 
+            return [Cart(*row) for row in rows]
         else: 
             return {}
 
@@ -33,11 +33,22 @@ class Cart:
             return 0
         else:
             rows = app.db.execute("""
-            SELECT SUM(c.quant * p.price) AS total_price
+            SELECT SUM(c.quant * p.price)
             FROM Carts c
             JOIN Products p ON c.pid = p.id
-            WHERE c.uid = c.uid;
+            WHERE c.uid = :uid;
             """,
             uid=uid)
-        return rows
+        return rows[0][0]
+    
+    @staticmethod
+    def addCart(uid, pid, quant):
+        rows = app.db.execute("""
+        INSERT INTO Carts(uid, pid, quant)
+        VALUES(:uid, :pid, :quant)
+        RETURNING id
+        """,
+        uid=uid, pid=pid, quant=1)
+        return Cart.get
+            
 

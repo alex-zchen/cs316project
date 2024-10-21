@@ -10,15 +10,17 @@
   <table class='table table-hover table-bordered container'>
     <thead class="thead-dark">
       <tr>
-        <th scope="col">Product</th>
+        <th scope="col">Product ID</th>
+        <th scope="col">Quantity</th>
         <th scope="col">Price</th>
       </tr>
     </thead>
     <tbody>
-      {% for mycart in ucart%}
+      {% for i in range(length)%}
         <tr>
-          <th scope="row">{{mycart.pid}}</th>
-          <td>{{mycart.quant}}</td>
+          <th scope="row">{{ucart[i].pid}}</th>
+          <td>{{ucart[i].quant}}</td>
+          <td>{{prices[i]}}</td>
         </tr>
       {% endfor %}
     </tbody>
