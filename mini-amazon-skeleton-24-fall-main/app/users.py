@@ -53,12 +53,8 @@ def updateInfo():
         address = None
     try:
         password = request.form.get('password')
-        if password:
-            password = generate_password_hash(password)
-        else:
-            password = current_user.password  
     except:
-        password = current_user.password
+        password = None
 
     try:
         balance = request.form.get('balance')
@@ -167,6 +163,7 @@ def update_balance_on_purchase():
     requestedChange = request.get('balanceChange')
     if(current_user.balance >= balanceChange):
         current_user.balance = current_user.balance - balanceChange
+        current_user.update_info(id = current_user.id, email = current_user.email, firstname = current_user.firstname, lastname = current_user.lastname, balance = current_user.balance, password = current_user.password, address = current_user.address)
         return True
     else:
         return False
