@@ -13,13 +13,23 @@
         .table-container {
             margin-left: 5%;
             margin-top: 2%;
+            display: flex;
+            gap: 10%;
+        }
+        .profile-table {
+            margin-top: 20px;
+        }
+        .user-info {
+            width: 60%;
+        }
+        .purchases {
+            width: 30%;
         }
     </style>
 </head>
 <body>
+    <h1 style="margin-top: 5%; margin-left: 5%;">Hello {{ user.firstname }}!</h1>
     <div class="table-container">
-        <h1>Hello {{ user.firstname }}!</h1>
-
         <table class="table profile-table">
             <thead class="thead-dark">
                 <tr>
@@ -56,9 +66,9 @@
                 </tr>
             </tbody>
         </table>
-    </div>
-    <table class="table profile-table">
-        <h2>Your Purchases</h2>
+        <div class="col">
+                <h2 style="font-size: 1.5rem; font-family: 'Playfair Display';">Your Purchases</h2>
+        <table class="table profile-table">
             <thead>
                 {% if purchases %}
                 <tr>
@@ -85,7 +95,6 @@
             </tbody>
         </table>
     </div>
-
 </body>
 </html>
 
