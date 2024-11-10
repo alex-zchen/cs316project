@@ -1,6 +1,6 @@
 from flask import render_template, redirect, url_for, flash, request
 from flask_login import login_user, logout_user, current_user
-import datetime
+from datetime import datetime 
 
 from .models.product import Product
 from .models.purchase import Purchase
@@ -14,10 +14,23 @@ bp = Blueprint('carts', __name__)
 def carts():
     # userid
     user_cart = {}
+    userid = current_user.id
     # find total price and cart:
     if(current_user.is_authenticated):
-        user_cart = Cart.get(current_user.id)
-    total_price = Cart.get_total_price(current_user.id)
+        user_cart = Cart.get(userid)
+    total_price = Cart.get_total_price(userid)
+
+    if request.method == 'POST':
+        # Call the buy_cart method to move items from cart to purchases
+        purchase_ids = Cart.buy_cart(userid)
+        if purchase_ids:
+            flash('Successfully moved items to Purchases.')
+        else:
+            flash('No items in cart to move or an error occurred.')
+        
+        return redirect(url_for('carts.carts'))
+
+
     # render the page by adding information to the index.html file
     return render_template('carts.html',
                            ucart=user_cart,
