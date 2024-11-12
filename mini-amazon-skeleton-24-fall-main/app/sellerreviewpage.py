@@ -50,9 +50,22 @@ def sellerreviewpagebackend():
             sreviews = SellerReviewReview.get_all_by_uid(current_user.id)
     else:
         sreviews = None
-    # render the page by adding information to the sellerreview.html file
+
+    if(sreviews): #Pagination for seller reviews, acting weird with redisplay though.
+        page_size = 5 
+        sreviewsPages = []
+
+        for i in range(0, len(sreviews), page_size):
+            page = sreviews[i:i + page_size]
+            sreviewsPages.append(page)
+        
+        print(sreviewsPages)
+    else:
+        sreviewsPages = [[]]
+        
+
     return render_template('sellerreview.html',
-                            sreviews=sreviews,
+                            sreviews=sreviewsPages,
                             form=form)
 
 @bp.route('/sellerreviewpage/delete/<int:seller_id>', methods=['POST'])
