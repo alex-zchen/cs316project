@@ -51,7 +51,8 @@ class Cart:
         """,
         uid=uid, pid=pid, quant=1)
         return Cart.get
-
+    
+    @staticmethod
     def remCart(uid, pid):
         rows = app.db.execute("""
         DELETE 
@@ -60,6 +61,7 @@ class Cart:
         """,
         uid=uid, pid=pid)
         return Cart.get
+
             
 
     @staticmethod

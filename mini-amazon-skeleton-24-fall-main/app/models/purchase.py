@@ -41,7 +41,7 @@ WHERE id = :id
             ''',
             uid=uid)
         return [Purchase(*row) for row in rows]
-    
+
     @staticmethod
     def if_purchased(uid, sid):
         rows = app.db.execute('''
@@ -55,7 +55,7 @@ WHERE id = :id
             uid=uid,
             sid=sid)
         return [Purchase(*(rows[0]))]  if rows else None
-
+      
     @staticmethod
     def add_purchase(uid, pid): #IN THE FUTURE SHOULD THROW ERROR IF PURCHASE IS NOT IN TABLE
         current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')

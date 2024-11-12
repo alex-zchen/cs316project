@@ -11,9 +11,9 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, IntegerField, BooleanField, SubmitField
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo
 from .models.sellerreview import SellerReviewReview
+
 from .models.purchase import Purchase
 from datetime import datetime
-
 
 from flask import Blueprint
 bp = Blueprint('sellerreviewpage', __name__)
