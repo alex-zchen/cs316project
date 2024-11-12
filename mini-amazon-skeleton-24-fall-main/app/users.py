@@ -4,7 +4,7 @@ from flask_login import login_user, logout_user, current_user
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, DecimalField
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo
-
+from datetime import datetime
 from .models.user import User
 from .models.purchase import Purchase
 from .models.product import Product
@@ -73,7 +73,8 @@ def updateInfo():
     purchases = Purchase.get_all_by_uid_since(uid = user.id, since = -1)
     print(user.id)
     productPurchases = []
-    for purchase in purchases:
+    #Loading purchases in
+    for i, purchase in enumerate(purchases):
         product = Product.get(purchase.pid)
         purchaseObj = {}
         purchaseObj['PurchaseDate'] = purchase.time_purchased
@@ -81,7 +82,20 @@ def updateInfo():
         purchaseObj['Amount Paid'] = product.price
         purchaseObj['Fufillment Status'] = "Not yet shipped"
         productPurchases.append(purchaseObj)
-    return render_template('profile.html', user = current_user, purchases = productPurchases)
+
+
+    page_size = 5 
+    productPurchasePages = []
+
+    for i in range(0, len(productPurchases), page_size):
+        page = productPurchases[i:i + page_size]
+        productPurchasePages.append(page)
+    
+    print(productPurchasePages)
+    if(len(productPurchasePages) == 0):
+        productPurchasePages = [[]]
+
+    return render_template('profile.html', user = current_user, purchases = productPurchasePages)
 
 @bp.route("/profile", methods=["GET"]) 
 def profileDisplay():
@@ -89,7 +103,8 @@ def profileDisplay():
     purchases = Purchase.get_all_by_uid_since(uid = user.id, since = -1)
     print(user.id)
     productPurchases = []
-    for purchase in purchases:
+    #Loading purchases in
+    for i, purchase in enumerate(purchases):
         product = Product.get(purchase.pid)
         purchaseObj = {}
         purchaseObj['PurchaseDate'] = purchase.time_purchased
@@ -97,7 +112,18 @@ def profileDisplay():
         purchaseObj['Amount Paid'] = product.price
         purchaseObj['Fufillment Status'] = "Not yet shipped"
         productPurchases.append(purchaseObj)
-    return render_template('profile.html', user=user, purchases=productPurchases)
+    page_size = 5 
+    productPurchasePages = []
+
+    for i in range(0, len(productPurchases), page_size):
+        page = productPurchases[i:i + page_size]
+        productPurchasePages.append(page)
+    
+    print(productPurchasePages)
+    if(len(productPurchasePages) == 0):
+        productPurchasePages = [[]]
+
+    return render_template('profile.html', user=user, purchases=productPurchasePages)
 
 @bp.route('/login', methods=['GET', 'POST'])
 def login():

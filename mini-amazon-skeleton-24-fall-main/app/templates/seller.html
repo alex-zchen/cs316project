@@ -2,6 +2,30 @@
 
 {% block content %}
 
+<style>
+    .pagination {
+        margin-top: 15px;
+        justify-content: left;
+        gap: 10px;
+    }
+    .page-button {
+        padding: 2px 10px;
+        border: 1px solid #000000;
+        border-radius: 50%;
+        font-size: 0.9rem;
+        width: 30px;
+        height: 30px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .active-page {
+        background-color: #007bff;
+        color: white;
+        border-color: #007bff;
+    }
+</style>
+
 <br><br>
 
 <h2>Your products for sale:</h2>
@@ -14,7 +38,7 @@
     </tr>
   </thead>
   <tbody>
-    {% for product in products_in_inventory%}
+    {% for product in products_in_inventory[request.args.get('page', 0)|int] %}
       <tr>
         <th scope="row">{{product.id}}</th>
         <td>{{product.name}}</td>
@@ -23,6 +47,15 @@
     {% endfor %}
   </tbody>
 </table>
+
+<div class="pagination">
+    {% for i in range(products_in_inventory|length) %}
+    <a href="{{ url_for('sellerpage.seller', page=i) }}" 
+       class="page-button {% if i == request.args.get('page', 0)|int %}active-page{% endif %}">
+        {{ i + 1 }}
+    </a>
+    {% endfor %}
+</div>
 
 <form action="" method="post">
   {{ form.hidden_tag() }}

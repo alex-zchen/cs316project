@@ -34,6 +34,18 @@ def seller():
     if current_user.is_authenticated:
         products_in_inventory = Product.filter_by(
             current_user.id)
+    
+    page_size = 5 
+    products_in_inventoryPages = []
+
+    for i in range(0, len(products_in_inventory), page_size):
+        page = products_in_inventory[i:i + page_size]
+        products_in_inventoryPages.append(page)
+    
+    print(products_in_inventoryPages)
+    if(len(products_in_inventoryPages) == 0):
+        products_in_inventoryPages = [[]]
+
     # render the page by adding information to the seller.html file
     return render_template('seller.html',
-                       products_in_inventory=products_in_inventory, form = form)
+                       products_in_inventory=products_in_inventoryPages, form = form)
