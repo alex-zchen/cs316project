@@ -13,10 +13,6 @@ from wtforms.validators import ValidationError, DataRequired, Email, EqualTo
 from .models.productreview import AllReviews
 from datetime import datetime
 
-from humanize import naturaltime
-def humanize_time(dt):
-    return naturaltime(datetime.now() - dt)
-
 from flask import Blueprint
 bp = Blueprint('productreviewpage', __name__)
 
@@ -55,7 +51,6 @@ def productreviewpagebackend():
     # render the page by adding information to the sellerreview.html file
     return render_template('productreview.html',
                             previews=previews,
-                            humanize_time=humanize_time,
                             form=form)
 
 @bp.route('/productreviewpage/delete/<int:product_id>', methods=['POST'])
