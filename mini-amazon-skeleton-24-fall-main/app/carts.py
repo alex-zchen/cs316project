@@ -36,4 +36,6 @@ def carts():
                            ucart=user_cart,
                            total=total_price, 
                            prices = [Product.get(i.pid).price for i in user_cart], 
-                           length = len(user_cart))
+                           length = len(user_cart),
+                           names = [Product.get(i.pid).name for i in user_cart])
+
