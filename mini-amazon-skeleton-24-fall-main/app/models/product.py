@@ -62,6 +62,7 @@ WHERE p.available = :available
     def filter_by(seller_id, k = 100):
         if seller_id:
             rows = app.db.execute('''
+
 WITH avg_ratings AS (
     SELECT pid, 
            AVG(rscore)::NUMERIC(10,1) as avg_rating,
@@ -157,6 +158,7 @@ LIMIT :k
                                 offset=(page - 1) * per_page)
 
         return [Product(*row) for row in rows]
+
 
     @staticmethod
     def get_filtered_count(search_query=None):

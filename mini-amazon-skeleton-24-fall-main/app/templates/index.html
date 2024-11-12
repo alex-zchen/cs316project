@@ -7,7 +7,12 @@
 <form method="GET" action="{{ url_for('products.product_list') }}">
   <div class="form-group">
     <label for="seller_id">Filter by Seller ID:</label>
-    <input type="text" class="form-control" id="seller_id" name="seller_id" placeholder="Enter Seller ID" value="{{ request.args.get('seller_id', '') }}">
+    <input type="text" class="form-control" id="seller_id" name="seller_id" placeholder="Enter Seller ID"
+      value="{{ request.args.get('seller_id', '') }}">
+  </div>
+  <div class="form-group">
+    <label for="top_k">Top K Expensive Products:</label>
+    <input type="number" class="form-control" id="top_k" name="top_k" placeholder="Enter number of top expensive products" value="{{ request.args.get('top_k', '') }}" min="1">
   </div>
   <div class="form-group">
     <label for="top_k">Top K Expensive Products:</label>
@@ -22,19 +27,27 @@
 <table class="table">
   <thead>
     <tr>
-      <th>Product ID</th>
-      <th>Product Name</th>
-      <th>Price</th>
-      <th>Seller ID</th>
+      <th scope="col">Product ID</th>
+      <th scope="col">Product Name</th>
+      <th scope="col">Price</th>
+      <th scope="col">Seller ID</th>
+      <th scope="col">Wishlist</th>
     </tr>
   </thead>
   <tbody>
-    {% for product in avail_products %}
+    {% for product in avail_products%}
     <tr>
-      <td>{{product.id}}</td>
+      <th scope="row">{{product.id}}</th>
       <td>{{product.name}}</td>
-      <td>${{product.price|round(2)}}</td>
+      <td>{{product.price}}</td>
       <td>{{product.seller_id}}</td>
+      <td>
+        {% if current_user.is_authenticated %}
+        <form action="{{ url_for('wishlist.wishlist_add', product_id=product.id) }}" method="POST">
+          <input type="submit" value="Add to Wishlist" />
+        </form>
+        {% endif %}
+      </td>
     </tr>
     {% endfor %}
   </tbody>
@@ -42,22 +55,34 @@
 
 <br><br>
 {% if current_user.is_authenticated %}
+<form action="" method="post">
+  {{ form.hidden_tag() }}
+  <p>
+    {{ form.pid.label }}<br/>
+    {{ form.pid(size=32) }}<br/>
+    {% for error in form.pid.errors %}
+    <span style="color: red;">[{{ error }}]</span>
+    {% endfor %}
+  </p>
+  <p>{{ form.submit() }}</p>
+</form>
+
 <h2>Your recent purchases:</h2>
 <table class='table table-hover table-bordered container'>
   <thead class="thead-dark">
     <tr>
       <th scope="col">Purchase ID</th>
-      <th scope="col">Product Name</th>
-      <th scope="col">Price</th>
+      <th scope="col">Product ID</th>
+      <th scope="col">Date</th>
     </tr>
   </thead>
   <tbody>
     {% for purchase in purchase_history%}
-      <tr>
-        <th scope="row">{{purchase.id}}</th>
-        <td>{{purchase.pid}}</td>
-        <td>{{purchase.time_purchased}}</td>
-      </tr>
+    <tr>
+      <th scope="row">{{purchase.id}}</th>
+      <td>{{purchase.pid}}</td>
+      <td>{{purchase.time_purchased}}</td>
+    </tr>
     {% endfor %}
   </tbody>
 </table>
