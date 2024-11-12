@@ -83,14 +83,19 @@ class Cart:
             # Check if any items were moved
             if not rows:
                 return None
-            app.db.execute("""
-                DELETE FROM Carts
-                WHERE uid = :uid
-            """, 
-            uid=uid)
+            if(current_user.balance >= Cart.get_total_price(current_user.id)):
+                current_user.balance = current_user.balance - Cart.get_total_price(current_user.id)
+                current_user.update_info(id = current_user.id, email = current_user.email, firstname = current_user.firstname, lastname = current_user.lastname, balance = current_user.balance, password = current_user.password, address = current_user.address)
+                app.db.execute("""
+                    DELETE FROM Carts
+                    WHERE uid = :uid
+                    """, 
+                    uid=uid)
+            
             
             # Return the IDs of the purchases made
             purchase_ids = [row[0] for row in rows]
+            
             return purchase_ids
 
         except Exception as e:
