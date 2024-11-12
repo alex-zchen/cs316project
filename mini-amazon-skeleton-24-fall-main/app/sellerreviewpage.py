@@ -11,11 +11,9 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, IntegerField, BooleanField, SubmitField
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo
 from .models.sellerreview import SellerReviewReview
+from .models.purchase import Purchase
 from datetime import datetime
 
-from humanize import naturaltime
-def humanize_time(dt):
-    return naturaltime(datetime.now() - dt)
 
 from flask import Blueprint
 bp = Blueprint('sellerreviewpage', __name__)
@@ -34,7 +32,9 @@ def sellerreviewpagebackend():
     form = SellerReviewForm()
     if form.validate_on_submit():
         if current_user.is_authenticated:
-            if (form.rscore.data>=0 and form.rscore.data<=5) and (len(SellerReviewReview.check_by_uid_for_sid(current_user.id, form.seller_name.data)) ==0):
+            if (form.rscore.data>=0 and form.rscore.data<=5) 
+                        and (len(SellerReviewReview.check_by_uid_for_sid(current_user.id, form.seller_name.data)) ==0)
+                         and (len(Purchase.if_purchased(current_user.id, form.seller_name.data)) !=0):
                 if SellerReviewReview.reviewSeller(current_user.id, 
                                 form.seller_name.data, form.rscore.data, 
                                 datetime.now()):
@@ -55,7 +55,6 @@ def sellerreviewpagebackend():
     # render the page by adding information to the sellerreview.html file
     return render_template('sellerreview.html',
                             sreviews=sreviews,
-                            humanize_time=humanize_time,
                             form=form)
 
 @bp.route('/sellerreviewpage/delete/<int:seller_id>', methods=['POST'])
