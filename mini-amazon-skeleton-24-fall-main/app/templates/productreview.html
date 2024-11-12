@@ -2,6 +2,30 @@
 
 {% block content %}
 
+<style>
+    .pagination {
+        margin-top: 15px;
+        justify-content: left;
+        gap: 10px;
+    }
+    .page-button {
+        padding: 2px 10px;
+        border: 1px solid #000000;
+        border-radius: 50%;
+        font-size: 0.9rem;
+        width: 30px;
+        height: 30px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .active-page {
+        background-color: #007bff;
+        color: white;
+        border-color: #007bff;
+    }
+</style>
+
 {% if current_user.is_authenticated %}
 <br>
 
@@ -16,7 +40,7 @@
 </form>
 <br><br>
 
-<h2>Your Reviews of Sellers:</h2>
+<h2>Your Reviews of Products:</h2>
 <table class='table table-hover table-bordered container'>
     <thead class="thead-dark">
         <tr>
@@ -28,7 +52,7 @@
         </tr>
     </thead>
     <tbody>
-        {% for review in previews%}
+        {% for review in previews[request.args.get('page', 0)|int] %}
         <tr>
             <td>{{review.pid}}</td>
             <td>{{review.rscore}}</td>
@@ -53,6 +77,16 @@
         {% endfor %}
     </tbody>
 </table>
+
+<div class="pagination">
+    {% for i in range(previews|length) %}
+    <a href="{{ url_for('productreviewpage.productreviewpagebackend', page=i) }}" 
+       class="page-button {% if i == request.args.get('page', 0)|int %}active-page{% endif %}">
+        {{ i + 1 }}
+    </a>
+    {% endfor %}
+</div>
+
 <br><br>
 
 <form action="" method="post">

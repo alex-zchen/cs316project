@@ -2,7 +2,13 @@
 
 {% block content %}
 
+<style>
+  .form-container {
+      margin-top: 20px; /* Adjust the value as needed */
+  }
+</style>
 
+<div class="form-container">
 <form action="{{ url_for('users.updateInfo') }}" method="POST">
   {{ form.hidden_tag() }}
   <p>
@@ -49,5 +55,5 @@
   </p>
   <p><button type="submit">Update Information</button></p>
 </form>
-
+</div>
 {% endblock %}
