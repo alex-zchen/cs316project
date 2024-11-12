@@ -42,7 +42,7 @@ WHERE id = :id
             uid=uid)
         return [Purchase(*row) for row in rows]
     
-        @staticmethod
+    @staticmethod
     def if_purchased(uid, sid):
         rows = app.db.execute('''
             SELECT Purchases.id, uid, pid, time_purchased

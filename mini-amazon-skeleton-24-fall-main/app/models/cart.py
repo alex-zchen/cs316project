@@ -51,6 +51,15 @@ class Cart:
         """,
         uid=uid, pid=pid, quant=1)
         return Cart.get
+
+    def remCart(uid, pid):
+        rows = app.db.execute("""
+        DELETE 
+        FROM Carts c
+        WHERE c.uid = :uid AND c.pid = :pid
+        """,
+        uid=uid, pid=pid)
+        return Cart.get
             
 
     @staticmethod

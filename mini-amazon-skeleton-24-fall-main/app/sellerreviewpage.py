@@ -32,9 +32,7 @@ def sellerreviewpagebackend():
     form = SellerReviewForm()
     if form.validate_on_submit():
         if current_user.is_authenticated:
-            if (form.rscore.data>=0 and form.rscore.data<=5) 
-                        and (len(SellerReviewReview.check_by_uid_for_sid(current_user.id, form.seller_name.data)) ==0)
-                         and (len(Purchase.if_purchased(current_user.id, form.seller_name.data)) !=0):
+            if (form.rscore.data>=0 and form.rscore.data<=5) and (len(SellerReviewReview.check_by_uid_for_sid(current_user.id, form.seller_name.data)) ==0) and (len(Purchase.if_purchased(current_user.id, form.seller_name.data)) !=0):
                 if SellerReviewReview.reviewSeller(current_user.id, 
                                 form.seller_name.data, form.rscore.data, 
                                 datetime.now()):
