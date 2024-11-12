@@ -6,10 +6,10 @@ import datetime
 
 from .models.wishlist import WishlistItem
 
-from humanize import naturaltime
+# from humanize import naturaltime
 
-def humanize_time(dt):
-    return naturaltime(datetime.datetime.now() - dt)
+# def humanize_time(dt):
+#     return naturaltime(datetime.datetime.now() - dt)
 
 from flask import Blueprint
 bp = Blueprint('wishlist', __name__)
