@@ -1,6 +1,6 @@
-1,vanilla ice cream, 0,2.99,true
-2,chocolate ice cream,0,2.99,true
-3,strawberry ice cream,0,2.99,true
-4,6-pack of paycheck pilsners,0,11.49,true
-5,seven fabergé easter eggs,0,1199000.00,true
-6,painting - the storm on the sea of galilee,0,44000000.00,true
+1,vanilla ice cream,1,2.99,true,Classic creamy vanilla ice cream made with Madagascar vanilla beans,1,https://images.unsplash.com/photo-1570197571499-95da1c16d4f4
+2,chocolate ice cream,1,2.99,true,Rich and creamy chocolate ice cream made with premium cocoa,1,https://images.unsplash.com/photo-1563805042-7684c019e1cb
+3,strawberry ice cream,1,2.99,true,Fresh strawberry ice cream made with real fruit pieces,1,https://images.unsplash.com/photo-1488900128323-21503983a07e
+4,6-pack of paycheck pilsners,1,11.49,true,Crisp and refreshing craft pilsner beer sold in packs of 6,2,https://images.unsplash.com/photo-1586993451228-09818021e309
+5,seven fabergé easter eggs,1,1199000.00,true,Collection of seven imperial Fabergé eggs featuring intricate designs and precious gems,3,https://images.unsplash.com/photo-1618336753974-aae8e04506aa
+6,painting - the storm on the sea of galilee,1,44000000.00,true,Rembrandt's only known seascape painting stolen from the Isabella Stewart Gardner Museum in 1990,4,https://upload.wikimedia.org/wikipedia/commons/f/f3/Rembrandt_Christ_in_the_Storm_on_the_Lake_of_Galilee.jpg
