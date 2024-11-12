@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% if current_user.is_authenticated %}
+<br>
+
+<form method="GET" action="">
+    <div class="form-group">
+        <label for="seller_id">Filter by Seller ID:</label>
+        <input type="text" class="form-control" id="seller_id" name="seller_id" placeholder="Enter Seller ID"
+            value="{{ request.args.get('seller_id', '') }}">
+    </div>
+    <button type="submit" class="btn btn-primary">Filter</button>
+    <a href="{{ url_for('sellerreviewpage.sellerreviewpagebackend') }}" class="btn btn-secondary">Clear Filter</a>
+</form>
+<br><br>
+
+<h2>Your Reviews of Sellers:</h2>
+<table class='table table-hover table-bordered container'>
+    <thead class="thead-dark">
+        <tr>
+            <th scope="col">Seller ID</th>
+            <th scope="col">Review Score</th>
+            <th scope="col">When Added</th>
+            <th scope="col">Delete?</th>
+            <th scope="col">Change?</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for review in sreviews%}
+        <tr>
+            <td>{{review.sid}}</td>
+            <td>{{review.rscore}}</td>
+            <td>{{humanize_time(review.time_reviewed)}}</td>
+            <td>
+                <form action="{{ url_for('sellerreviewpage.seller_delete', seller_id=review.sid) }}" method="POST">
+                    <input type="submit" value="Delete" />
+                </form>
+            </td>
+            <td>
+                <form action="{{ url_for('sellerreviewpage.seller_change', seller_id=review.sid) }}" method="POST">
+                    <p>
+                        {{ form.rscore(size=32) }}<br />
+                        {% for error in form.rscore.errors %}
+                        <span style="color: red;">[{{ error }}]</span>
+                        {% endfor %}
+                    </p>
+                    <input type="submit" value="Change" />
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<br><br>
+
+<form action="" method="post">
+    {{ form.hidden_tag() }}
+    <p>
+        {{ form.seller_name.label }}<br />
+        {{ form.seller_name(size=32) }}<br />
+        {% for error in form.seller_name.errors %}
+        <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </p>
+    <p>
+        {{ form.rscore.label }}<br />
+        {{ form.rscore(size=32) }}<br />
+        {% for error in form.rscore.errors %}
+        <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </p>
+    <p>{{ form.submit() }}</p>
+</form>
+{% else %}
+<p><a href="{{ url_for('users.login') }}">Log in</a> to see your review history!</p>
+{% endif %}
+
+{% endblock %}
