@@ -59,10 +59,15 @@
       <a href="{{ url_for('users.profileDisplay') }}" type="button" class="btn btn-light">
         <i class="fa fa-user"></i> Profile
       </a>
+      <a href="{{ url_for('productreviewpage.productreviewpagebackend') }}" type="button" class="btn btn-light">Reviews
+        of
+        Products</a>
+      <a href="{{ url_for('sellerreviewpage.sellerreviewpagebackend') }}" type="button" class="btn btn-light">Reviews of
+        Sellers</a>
       <a href="{{ url_for('carts.carts') }}" type="button" class="btn btn-light">
         Cart
       </a>
-      <a href="{{ url_for('sellerpage.seller') }}" class="btn btn-secondary">Go to Your Seller Page</a>
+      <a href="{{ url_for('sellerpage.seller') }}" type="button" class="btn btn-secondary">Go to Your Seller Page</a>
       {% else %}
       <a href="{{ url_for('users.login') }}" type="button" class="btn btn-light">Log in</a>
       {% endif %}
@@ -73,5 +78,6 @@
     {% block content %}{% endblock %}
   </div>
 </body>
+
 
 </html>

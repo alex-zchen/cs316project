@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="max-w-4xl mx-auto bg-white rounded-lg shadow-md overflow-hidden">
+        <div class="md:flex">
+<!-- Product Image -->
+<div style="height: 50%; width: 50%; overflow: hidden;">
+    {% if product.image_url %}
+    <a href="{{ url_for('products.product_detail', product_id=product.id) }}">
+        <img src="{{ product.image_url }}" 
+             alt="{{ product.name }}" 
+             style="width: 100%; height: 100%; object-fit: cover;">
+    </a>
+    {% else %}
+    <div class="w-full h-full bg-gray-200 flex items-center justify-center">
+        <span class="text-gray-500">No image available</span>
+    </div>
+    {% endif %}
+</div>
+
+            <!-- Product Details Section -->
+            <div class="p-8 md:w-1/2">
+                <div class="uppercase tracking-wide text-sm text-indigo-500 font-semibold">
+                    Product ID: {{ product.id }}
+                </div>
+
+                <h1 class="mt-2 text-3xl font-bold text-gray-900">{{ product.name }}</h1>
+
+                <!-- Price -->
+                <div class="mt-4">
+                    <span class="text-3xl font-bold text-gray-900">${{ "%.2f"|format(product.price) }}</span>
+                </div>
+
+                <!-- Rating -->
+                <div class="mt-4 flex items-center">
+                    <div class="flex">
+                        {% for i in range(5) %}
+                        <span class="text-xl {% if i < product.avg_rating|int %}text-yellow-400{% else %}text-gray-300{% endif %}">★</span>
+                        {% endfor %}
+                    </div>
+                    <span class="ml-2 text-gray-600">
+                        {{ "%.1f"|format(product.avg_rating) }} ({{ product.review_count }} reviews)
+                    </span>
+                </div>
+
+                <!-- Description -->
+                {% if product.description %}
+                <div class="mt-4">
+                    <h2 class="text-xl font-semibold mb-2">Description</h2>
+                    <p class="text-gray-600">{{ product.description }}</p>
+                </div>
+                {% endif %}
+
+                <!-- Additional Details -->
+                <div class="mt-6 space-y-2">
+                    <p class="text-gray-600">
+                        <span class="font-semibold">Category:</span>
+                        {{ product.category_id if product.category_id else "Uncategorized" }}
+                    </p>
+                    <p class="text-gray-600">
+                        <span class="font-semibold">Seller ID:</span>
+                        {{ product.seller_id }}
+                    </p>
+                    <p class="text-gray-600">
+                        <span class="font-semibold">Status:</span>
+                        {% if product.available %}
+                        <span class="text-green-600">In Stock</span>
+                        {% else %}
+                        <span class="text-red-600">Out of Stock</span>
+                        {% endif %}
+                    </p>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="mt-8 space-x-4">
+                    <a href="{{ url_for('products.product_list') }}" 
+                       class="inline-block bg-gray-500 text-white px-6 py-2 rounded hover:bg-gray-600">
+                        ← Back to Products
+                    </a>
+                    {% if product.available %}
+                    <button class="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600">
+                        Add to Cart
+                    </button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

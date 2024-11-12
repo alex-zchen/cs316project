@@ -4,7 +4,7 @@
 
 <br><br>
 
-<form method="GET" action="">
+<form method="GET" action="{{ url_for('products.product_list') }}">
   <div class="form-group">
     <label for="seller_id">Filter by Seller ID:</label>
     <input type="text" class="form-control" id="seller_id" name="seller_id" placeholder="Enter Seller ID"
@@ -14,14 +14,14 @@
     <label for="top_k">Top K Expensive Products:</label>
     <input type="number" class="form-control" id="top_k" name="top_k" placeholder="Enter number of top expensive products" value="{{ request.args.get('top_k', '') }}" min="1">
   </div>
-  <button type="submit" class="btn btn-primary">Filter</button>
-  <a href="{{ url_for('index.index') }}" class="btn btn-secondary">Clear Filter</a>
+  <button type="submit" class="btn btn-primary">Apply</button>
+  <a href="{{ url_for('products.product_list') }}" class="btn btn-secondary">Clear Filters</a>
 </form>
 
+<h2>{% if request.args.get('top_k') %}Top {{ request.args.get('top_k') }} Most Expensive Products{% else %}Products for sale{% endif %}:</h2>
 
-<h2>Products for sale:</h2>
-<table class='table table-hover table-bordered container'>
-  <thead class="thead-dark">
+<table class="table">
+  <thead>
     <tr>
       <th scope="col">Product ID</th>
       <th scope="col">Product Name</th>
