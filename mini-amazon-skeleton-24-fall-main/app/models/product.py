@@ -185,20 +185,27 @@ LIMIT :k
         return rows[0][0] if rows is not None else 0
 
     @staticmethod
-    def list_product(name, seller_id, price, description=None, category_id=None, image_url=None):
+    def list_product(name, seller_id, price, description=None, category_id=None, image_url=None, quantity=1):
         try:
+            if quantity < 0:
+                return None
+            
+            if price < 0:
+                return None
+            
             rows = app.db.execute("""
-INSERT INTO Products(name, seller_id, price, available, description, category_id, image_url)
-VALUES(:name, :seller_id, :price, :available, :description, :category_id, :image_url)
+INSERT INTO Products(name, seller_id, price, available, description, category_id, image_url, quantity)
+VALUES(:name, :seller_id, :price, :available, :description, :category_id, :image_url, :quantity)
 RETURNING id
 """,
-                                name=name,
-                                seller_id=seller_id, 
-                                price=price, 
-                                available='true',
-                                description=description,
-                                category_id=category_id,
-                                image_url=image_url)
+                                    name=name,
+                                    seller_id=seller_id, 
+                                    price=price, 
+                                    available='true',
+                                    description=description,
+                                    category_id=category_id,
+                                    image_url=image_url,
+                                    quantity=quantity)
             id = rows[0][0]
             return Product.get(id)
         except Exception as e:

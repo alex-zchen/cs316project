@@ -26,7 +26,7 @@ def carts():
         if purchase_ids:
             flash('Successfully Purchased Items. You can view your purchase history in your profile page.')
         else:
-            flash('No items in cart to buy in cart or insufficient balance.')
+            flash('No items in cart to buy in cart, insufficient balance, or an error occurred.')
         
         return redirect(url_for('carts.carts'))
 

@@ -46,6 +46,17 @@
 
 <br><br>
 
+<!-- Add flash messages section -->
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-info" role="alert">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+
 <div class="view-toggle">
   <a href="{{ url_for('sellerpage.seller', view='current') }}" 
      class="{% if view_type == 'current' or not view_type %}active{% endif %}">
@@ -61,24 +72,32 @@
 <table class='table table-hover table-bordered container'>
 <thead class="thead-dark">
   <tr>
+    {% if view_type == 'sold' %}
+    <th scope="col">Purchase ID</th>
+    {% endif %}
     <th scope="col">Product ID</th>
     <th scope="col">Product Name</th>
     <th scope="col">Price</th>
     {% if view_type == 'sold' %}
     <th scope="col">Buyer ID</th>
     <th scope="col">Purchase Date</th>
+    <th scope="col">Fulfillment Status</th>
     {% endif %}
   </tr>
 </thead>
 <tbody>
   {% for product in products_in_inventory[request.args.get('page', 0)|int] %}
     <tr>
+      {% if view_type == 'sold' %}
+      <td>{{product.purchase_id}}</td>
+      {% endif %}
       <th scope="row">{{product.id}}</th>
       <td>{{product.name}}</td>
       <td>{{product.price}}</td>
       {% if view_type == 'sold' %}
       <td>{{product.buyer_id}}</td>
-      <td>{{product.purchase_time}}</td>
+      <td>{{product.time_purchased}}</td>
+      <td>{% if product.fulfilled %}Fulfilled{% else %}Pending{% endif %}</td>
       {% endif %}
     </tr>
   {% endfor %}
@@ -96,22 +115,56 @@
 
 {% if view_type != 'sold' %}
 <form action="" method="post">
-{{ form.hidden_tag() }}
-<p>
-  {{ form.product_name.label }}<br/>
-  {{ form.product_name(size=32) }}<br/>
-  {% for error in form.product_name.errors %}
-  <span style="color: red;">[{{ error }}]</span>
-  {% endfor %}
-</p>
-<p>
-  {{ form.price.label }}<br/>
-  {{ form.price(size=32) }}<br/>
-  {% for error in form.price.errors %}
-  <span style="color: red;">[{{ error }}]</span>
-  {% endfor %}
-</p>
-<p>{{ form.submit() }}</p>
+    {{ form.hidden_tag() }}
+    <div class="form-group">
+        {{ form.product_name.label }}<br/>
+        {{ form.product_name(size=32, class="form-control") }}<br/>
+        {% for error in form.product_name.errors %}
+        <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </div>
+
+    <div class="form-group">
+        {{ form.price.label }}<br/>
+        {{ form.price(size=32, class="form-control") }}<br/>
+        {% for error in form.price.errors %}
+        <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </div>
+
+    <div class="form-group">
+        {{ form.description.label }}<br/>
+        {{ form.description(rows=4, class="form-control") }}<br/>
+        {% for error in form.description.errors %}
+        <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </div>
+
+    <div class="form-group">
+        {{ form.category_id.label }}<br/>
+        {{ form.category_id(class="form-control") }}<br/>
+        {% for error in form.category_id.errors %}
+        <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </div>
+
+    <div class="form-group">
+        {{ form.image_url.label }}<br/>
+        {{ form.image_url(size=32, class="form-control") }}<br/>
+        {% for error in form.image_url.errors %}
+        <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </div>
+
+    <div class="form-group">
+        {{ form.quantity.label }}<br/>
+        {{ form.quantity(size=32, class="form-control") }}<br/>
+        {% for error in form.quantity.errors %}
+        <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </div>
+
+    <p>{{ form.submit(class="btn btn-primary") }}</p>
 </form>
 {% endif %}
 

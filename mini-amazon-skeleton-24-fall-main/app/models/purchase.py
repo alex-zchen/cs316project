@@ -78,7 +78,7 @@ RETURNING id
     @staticmethod
     def get_seller_sold_products(seller_id):
         rows = app.db.execute('''
-        SELECT p.id, p.name, p.price, pu.uid as buyer_id, pu.time_purchased
+        SELECT p.id, p.name, p.price, pu.uid as buyer_id, pu.time_purchased, pu.id as purchase_id
         FROM Products p
         JOIN Purchases pu ON p.id = pu.pid
         WHERE p.seller_id = :seller_id
