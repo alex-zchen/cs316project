@@ -24,9 +24,9 @@ def carts():
         # Call the buy_cart method to move items from cart to purchases
         purchase_ids = Cart.buy_cart(userid)
         if purchase_ids:
-            flash('Successfully moved items to Purchases.')
+            flash('Successfully Purchased Items. You can view your purchase history in your profile page.')
         else:
-            flash('No items in cart to move or an error occurred.')
+            flash('No items in cart to buy in cart or insufficient balance.')
         
         return redirect(url_for('carts.carts'))
 

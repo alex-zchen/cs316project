@@ -24,56 +24,95 @@
         color: white;
         border-color: #007bff;
     }
+    .view-toggle {
+        margin: 20px 0;
+    }
+    
+    .view-toggle a {
+        padding: 8px 16px;
+        text-decoration: none;
+        color: #333;
+        border: 1px solid #ddd;
+        margin-right: 5px;
+        border-radius: 4px;
+    }
+    
+    .view-toggle a.active {
+        background-color: #007bff;
+        color: white;
+        border-color: #007bff;
+    }
 </style>
 
 <br><br>
 
-<h2>Your products for sale:</h2>
+<div class="view-toggle">
+  <a href="{{ url_for('sellerpage.seller', view='current') }}" 
+     class="{% if view_type == 'current' or not view_type %}active{% endif %}">
+      Current Listings
+  </a>
+  <a href="{{ url_for('sellerpage.seller', view='sold') }}" 
+     class="{% if view_type == 'sold' %}active{% endif %}">
+      Sold Products
+  </a>
+</div>
+
+<h2>{% if view_type == 'sold' %}Your Sold Products:{% else %}Your Products for Sale:{% endif %}</h2>
 <table class='table table-hover table-bordered container'>
-  <thead class="thead-dark">
+<thead class="thead-dark">
+  <tr>
+    <th scope="col">Product ID</th>
+    <th scope="col">Product Name</th>
+    <th scope="col">Price</th>
+    {% if view_type == 'sold' %}
+    <th scope="col">Buyer ID</th>
+    <th scope="col">Purchase Date</th>
+    {% endif %}
+  </tr>
+</thead>
+<tbody>
+  {% for product in products_in_inventory[request.args.get('page', 0)|int] %}
     <tr>
-      <th scope="col">Product ID</th>
-      <th scope="col">Product Name</th>
-      <th scope="col">Price</th>
+      <th scope="row">{{product.id}}</th>
+      <td>{{product.name}}</td>
+      <td>{{product.price}}</td>
+      {% if view_type == 'sold' %}
+      <td>{{product.buyer_id}}</td>
+      <td>{{product.purchase_time}}</td>
+      {% endif %}
     </tr>
-  </thead>
-  <tbody>
-    {% for product in products_in_inventory[request.args.get('page', 0)|int] %}
-      <tr>
-        <th scope="row">{{product.id}}</th>
-        <td>{{product.name}}</td>
-        <td>{{product.price}}</td>
-      </tr>
-    {% endfor %}
-  </tbody>
+  {% endfor %}
+</tbody>
 </table>
 
 <div class="pagination">
-    {% for i in range(products_in_inventory|length) %}
-    <a href="{{ url_for('sellerpage.seller', page=i) }}" 
-       class="page-button {% if i == request.args.get('page', 0)|int %}active-page{% endif %}">
-        {{ i + 1 }}
-    </a>
-    {% endfor %}
+  {% for i in range(products_in_inventory|length) %}
+  <a href="{{ url_for('sellerpage.seller', view=view_type, page=i) }}" 
+     class="page-button {% if i == request.args.get('page', 0)|int %}active-page{% endif %}">
+      {{ i + 1 }}
+  </a>
+  {% endfor %}
 </div>
 
+{% if view_type != 'sold' %}
 <form action="" method="post">
-  {{ form.hidden_tag() }}
-  <p>
-    {{ form.product_name.label }}<br/>
-    {{ form.product_name(size=32) }}<br/>
-    {% for error in form.product_name.errors %}
-    <span style="color: red;">[{{ error }}]</span>
-    {% endfor %}
-  </p>
-  <p>
-    {{ form.price.label }}<br/>
-    {{ form.price(size=32) }}<br/>
-    {% for error in form.price.errors %}
-    <span style="color: red;">[{{ error }}]</span>
-    {% endfor %}
-  </p>
-  <p>{{ form.submit() }}</p>
+{{ form.hidden_tag() }}
+<p>
+  {{ form.product_name.label }}<br/>
+  {{ form.product_name(size=32) }}<br/>
+  {% for error in form.product_name.errors %}
+  <span style="color: red;">[{{ error }}]</span>
+  {% endfor %}
+</p>
+<p>
+  {{ form.price.label }}<br/>
+  {{ form.price(size=32) }}<br/>
+  {% for error in form.price.errors %}
+  <span style="color: red;">[{{ error }}]</span>
+  {% endfor %}
+</p>
+<p>{{ form.submit() }}</p>
 </form>
+{% endif %}
 
-{% endblock %}
+{% endblock %} 

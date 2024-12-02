@@ -75,3 +75,13 @@ RETURNING id
             # the following simply prints the error to the console:
             print(str(e))
             return None
+    @staticmethod
+    def get_seller_sold_products(seller_id):
+        rows = app.db.execute('''
+        SELECT p.id, p.name, p.price, pu.uid as buyer_id, pu.time_purchased
+        FROM Products p
+        JOIN Purchases pu ON p.id = pu.pid
+        WHERE p.seller_id = :seller_id
+        ORDER BY pu.time_purchased DESC
+        ''', seller_id=seller_id)
+        return rows 

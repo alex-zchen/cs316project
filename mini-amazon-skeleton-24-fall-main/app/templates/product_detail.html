@@ -1,7 +1,31 @@
 {% extends "base.html" %}
 
 {% block content %}
+<style>
+    .btn, button, input[type="submit"] {
+        background-color: #000000 !important;
+        color: #ffffff !important;
+        border-color: #000000;
+    }
+    
+    .btn:hover, button:hover, input[type="submit"]:hover {
+        background-color: #333333 !important;
+        border-color: #333333;
+    }
+</style>
+
 <div class="container mx-auto px-4 py-8">
+    <!-- Add flash messages section -->
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-info" role="alert">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
     <div class="max-w-4xl mx-auto bg-white rounded-lg shadow-md overflow-hidden">
         <div class="md:flex">
 <!-- Product Image -->
@@ -70,20 +94,18 @@
                         <span class="text-red-600">Out of Stock</span>
                         {% endif %}
                     </p>
-                </div>
 
-                <!-- Action Buttons -->
-                <div class="mt-8 space-x-4">
-                    <a href="{{ url_for('products.product_list') }}" 
-                       class="inline-block bg-gray-500 text-white px-6 py-2 rounded hover:bg-gray-600">
-                        ← Back to Products
-                    </a>
+                    <!-- Add to Cart Button -->
                     {% if product.available %}
-                    <button class="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600">
-                        Add to Cart
-                    </button>
+                    <form action="{{ url_for('products.add_to_cart', product_id=product.id) }}" method="POST" class="mt-4">
+                        <button type="submit" 
+                                class="bg-black text-white px-6 py-2 rounded-md hover:bg-gray-800 transition-colors">
+                            Add to Cart
+                        </button>
+                    </form>
                     {% endif %}
                 </div>
+
             </div>
         </div>
     </div>

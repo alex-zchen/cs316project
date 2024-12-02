@@ -1,6 +1,7 @@
 from flask_login import current_user
 from flask import jsonify
 from .models.product import Product
+from .models.purchase import Purchase
 from flask import Blueprint
 from flask import render_template
 from flask_wtf import FlaskForm
@@ -22,30 +23,35 @@ class ListForm(FlaskForm):
 
 @bp.route('/sellerpage', methods=['GET', 'POST'])
 def seller():
-    # get all available products for sale:
-    products_in_inventory = {}
     form = ListForm()
+    view_type = request.args.get('view', 'current')  # 'current' or 'sold'
+    
     if form.validate_on_submit():
         if Product.list_product(
             form.product_name.data, current_user.id, form.price.data
         ):
             return redirect(url_for('sellerpage.seller'))
-    # find the products current user has listed:
+    
+    products = []
     if current_user.is_authenticated:
-        products_in_inventory = Product.filter_by(
-            current_user.id)
+        if view_type == 'sold':
+            # Get sold products
+            products = Purchase.get_seller_sold_products(current_user.id)
+        else:
+            # Get current listings
+            products = Product.filter_by(current_user.id)
     
     page_size = 5 
-    products_in_inventoryPages = []
+    product_pages = []
 
-    for i in range(0, len(products_in_inventory), page_size):
-        page = products_in_inventory[i:i + page_size]
-        products_in_inventoryPages.append(page)
+    for i in range(0, len(products), page_size):
+        page = products[i:i + page_size]
+        product_pages.append(page)
     
-    print(products_in_inventoryPages)
-    if(len(products_in_inventoryPages) == 0):
-        products_in_inventoryPages = [[]]
+    if len(product_pages) == 0:
+        product_pages = [[]]
 
-    # render the page by adding information to the seller.html file
     return render_template('seller.html',
-                       products_in_inventory=products_in_inventoryPages, form = form)
+                         products_in_inventory=product_pages,
+                         form=form,
+                         view_type=view_type) 
