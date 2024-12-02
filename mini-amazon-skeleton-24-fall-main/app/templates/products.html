@@ -15,6 +15,35 @@
             background-color: #333333 !important;
             border-color: #333333;
         }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 30px 0;
+            gap: 8px;
+        }
+
+        .page-button {
+            padding: 8px 16px;
+            border: 1px solid #000;
+            border-radius: 4px;
+            text-decoration: none;
+            color: #000;
+            transition: all 0.3s ease;
+        }
+
+        .page-button:hover {
+            background-color: #333;
+            border-color: #000;
+            color: white;
+        }
+
+        .page-button.active-page {
+            background-color: #000;
+            border-color: #000;
+            color: white;
+        }
     </style>
 
     <!-- Search and Filter Form -->
@@ -106,28 +135,34 @@
 
     <!-- Pagination -->
     {% if total_pages > 1 %}
-    <div class="flex justify-center mt-8 space-x-2">
+    <div class="pagination">
         {% if page > 1 %}
         <a href="{{ url_for('products.product_list', page=page-1, search=search_query, sort_by=sort_by, sort_order=sort_order) }}" 
-           class="px-4 py-2 bg-white border rounded hover:bg-gray-100">
-            Previous
+           class="page-button">
+            &laquo;
         </a>
         {% endif %}
         
+        {% set window_size = 2 %}
         {% for p in range(1, total_pages + 1) %}
-        <a href="{{ url_for('products.product_list', page=p, search=search_query, sort_by=sort_by, sort_order=sort_order) }}"
-           class="px-4 py-2 {% if p == page %}bg-black text-white{% else %}bg-white{% endif %} border rounded hover:bg-gray-100">
-            {{ p }}
-        </a>
+            {% if p == 1 or p == total_pages or (p >= page - window_size and p <= page + window_size) %}
+                <a href="{{ url_for('products.product_list', page=p, search=search_query, sort_by=sort_by, sort_order=sort_order) }}"
+                   class="page-button {% if p == page %}active-page{% endif %}">
+                    {{ p }}
+                </a>
+            {% elif p == page - window_size - 1 or p == page + window_size + 1 %}
+                <span class="px-3 py-2 text-gray-500">...</span>
+            {% endif %}
         {% endfor %}
         
         {% if page < total_pages %}
         <a href="{{ url_for('products.product_list', page=page+1, search=search_query, sort_by=sort_by, sort_order=sort_order) }}" 
-           class="px-4 py-2 bg-white border rounded hover:bg-gray-100">
-            Next
+           class="page-button">
+            &raquo;
         </a>
         {% endif %}
     </div>
+
     {% endif %}
 </div>
 {% endblock %}

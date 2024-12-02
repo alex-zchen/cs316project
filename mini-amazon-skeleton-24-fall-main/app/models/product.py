@@ -2,7 +2,7 @@ from flask import current_app as app
 
 
 class Product:
-    def __init__(self, id, name, seller_id, price, available, description=None, category_id=None, image_url=None, avg_rating=None, review_count=None):
+    def __init__(self, id, name, seller_id, price, available, description=None, category_id=None, image_url=None, avg_rating=None, review_count=None, quantity=None):
         self.id = id
         self.name = name
         self.seller_id = seller_id
@@ -13,6 +13,7 @@ class Product:
         self.image_url = image_url
         self.avg_rating = avg_rating
         self.review_count = review_count
+        self.quantity = quantity
 
     @staticmethod
     def get(id):
@@ -59,10 +60,9 @@ WHERE p.available = :available
         return [Product(*row) for row in rows]
 
     @staticmethod 
-    def filter_by(seller_id, k = 100):
+    def filter_by(seller_id, k = 10000):
         if seller_id:
             rows = app.db.execute('''
-
 WITH avg_ratings AS (
     SELECT pid, 
            AVG(rscore)::NUMERIC(10,1) as avg_rating,
@@ -74,7 +74,8 @@ WITH avg_ratings AS (
 SELECT p.id, p.name, p.seller_id, p.price, p.available, 
        p.description, p.category_id, p.image_url,
        COALESCE(r.avg_rating, 0) as avg_rating,
-       COALESCE(r.review_count, 0) as review_count
+       COALESCE(r.review_count, 0) as review_count,
+       p.quantity
 FROM Products p
 LEFT JOIN avg_ratings r ON p.id = r.pid
 WHERE p.seller_id = :seller_id
@@ -97,7 +98,8 @@ WITH avg_ratings AS (
 SELECT p.id, p.name, p.seller_id, p.price, p.available, 
        p.description, p.category_id, p.image_url,
        COALESCE(r.avg_rating, 0) as avg_rating,
-       COALESCE(r.review_count, 0) as review_count
+       COALESCE(r.review_count, 0) as review_count,
+       p.quantity
 FROM Products p
 LEFT JOIN avg_ratings r ON p.id = r.pid
 ORDER BY p.price DESC

@@ -1,0 +1,192 @@
+/* General styles */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+h2 {
+    color: #2c3e50;
+    margin-bottom: 30px;
+    font-weight: 600;
+}
+
+/* Table styles */
+.table {
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 30px;
+}
+
+.thead-dark {
+    background-color: #2c3e50;
+    color: white;
+}
+
+.table th, .table td {
+    padding: 12px 15px;
+    vertical-align: middle;
+}
+
+.table tbody tr:hover {
+    background-color: #f8f9fa;
+    transition: background-color 0.3s ease;
+}
+
+/* Pagination styles */
+.pagination {
+    margin-top: 25px;
+    justify-content: center;
+    gap: 8px;
+}
+
+.page-button {
+    padding: 5px 12px;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    width: auto;
+    height: auto;
+    min-width: 35px;
+    transition: all 0.3s ease;
+}
+
+.page-button:hover {
+    background-color: #f0f0f0;
+    text-decoration: none;
+}
+
+.active-page {
+    background-color: #3498db;
+    color: white;
+    border-color: #3498db;
+}
+
+/* View toggle styles */
+.view-toggle {
+    margin: 30px 0;
+    text-align: center;
+}
+
+.view-toggle a {
+    padding: 10px 20px;
+    text-decoration: none;
+    color: #555;
+    border: 1px solid #ddd;
+    margin-right: 10px;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+}
+
+.view-toggle a:hover {
+    background-color: #f8f9fa;
+}
+
+.view-toggle a.active {
+    background-color: #3498db;
+    color: white;
+    border-color: #3498db;
+}
+
+/* Form styles */
+.form-group {
+    margin-bottom: 25px;
+}
+
+.form-control {
+    border-radius: 6px;
+    border: 1px solid #ddd;
+    padding: 10px 15px;
+    transition: border-color 0.3s ease;
+}
+
+.form-control:focus {
+    border-color: #3498db;
+    box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+}
+
+.btn-primary {
+    background-color: #3498db;
+    border-color: #3498db;
+    padding: 10px 25px;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    background-color: #2980b9;
+    border-color: #2980b9;
+}
+
+/* Alert styles */
+.alert {
+    border-radius: 6px;
+    padding: 15px 20px;
+    margin-bottom: 20px;
+    border: none;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.alert-info {
+    background-color: #d1ecf1;
+    color: #0c5460;
+}
+
+/* Card styles */
+.card {
+    border-radius: 8px;
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.card-header {
+    background-color: #2c3e50;
+    color: white;
+    border-radius: 8px 8px 0 0 !important;
+}
+
+/* Navigation styles */
+.navbar {
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+    background-color: #2c3e50;
+}
+
+.navbar-dark .navbar-nav .nav-link {
+    color: rgba(255, 255, 255, 0.8);
+    transition: color 0.3s ease;
+}
+
+.navbar-dark .navbar-nav .nav-link:hover {
+    color: white;
+}
+
+/* Button styles */
+.btn {
+    border-radius: 6px;
+    transition: all 0.3s ease;
+}
+
+.btn-secondary {
+    background-color: #95a5a6;
+    border-color: #95a5a6;
+}
+
+.btn-secondary:hover {
+    background-color: #7f8c8d;
+    border-color: #7f8c8d;
+}
+
+/* Input group styles */
+.input-group {
+    margin-bottom: 1rem;
+}
+
+.input-group-text {
+    background-color: #f8f9fa;
+    border-color: #ddd;
+} 

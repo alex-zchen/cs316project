@@ -80,7 +80,7 @@ def updateInfo():
         purchaseObj['PurchaseDate'] = purchase.time_purchased
         purchaseObj["ProductName"] = product.name
         purchaseObj['Amount Paid'] = product.price
-        purchaseObj['Fufillment Status'] = "Not yet shipped"
+        purchaseObj['Fulfillment Status'] = "Not yet shipped" if not purchase.fulfilled else "Shipped"
         productPurchases.append(purchaseObj)
 
 
@@ -110,7 +110,7 @@ def profileDisplay():
         purchaseObj['PurchaseDate'] = purchase.time_purchased
         purchaseObj["ProductName"] = product.name
         purchaseObj['Amount Paid'] = product.price
-        purchaseObj['Fufillment Status'] = "Not yet shipped"
+        purchaseObj['Fulfillment Status'] = "Not yet shipped" if not purchase.fulfilled else "Shipped"
         productPurchases.append(purchaseObj)
     page_size = 5 
     productPurchasePages = []

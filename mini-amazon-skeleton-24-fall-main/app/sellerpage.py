@@ -12,6 +12,7 @@ from flask_login import login_user, logout_user, current_user
 from flask_wtf import FlaskForm
 from wtforms import StringField, IntegerField, BooleanField, SubmitField, SelectField, TextAreaField
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo
+from flask import current_app as app
 
 bp = Blueprint('sellerpage', __name__)
 
@@ -38,7 +39,13 @@ def seller():
     
     if form.validate_on_submit():
         if Product.list_product(
-            form.product_name.data, current_user.id, form.price.data
+            form.product_name.data, 
+            current_user.id, 
+            form.price.data,
+            description=form.description.data,
+            category_id=form.category_id.data,
+            image_url=form.image_url.data,
+            quantity=form.quantity.data
         ):
             flash("Product listed successfully!")
             return redirect(url_for('sellerpage.seller'))
@@ -68,3 +75,33 @@ def seller():
                          products_in_inventory=product_pages,
                          form=form,
                          view_type=view_type) 
+
+@bp.route('/update_quantity/<int:product_id>', methods=['POST'])
+def update_quantity(product_id):
+    new_quantity = request.form.get('new_quantity', type=int)
+    if new_quantity is not None and new_quantity >= 0:
+        # Update the quantity in the database
+        app.db.execute("""
+            UPDATE Products
+            SET quantity = :quantity
+            WHERE id = :id AND seller_id = :seller_id
+            """,
+            quantity=new_quantity,
+            id=product_id,
+            seller_id=current_user.id)
+        flash('Quantity updated successfully!')
+    else:
+        flash('Invalid quantity value!')
+    return redirect(url_for('sellerpage.seller')) 
+
+@bp.route('/update_fulfillment/<int:purchase_id>', methods=['POST'])
+def update_fulfillment(purchase_id):
+    app.db.execute("""
+        UPDATE Purchases
+        SET fulfilled = TRUE
+        WHERE id = :purchase_id 
+        AND fulfilled = FALSE
+        """,
+        purchase_id=purchase_id)
+    flash('Order marked as fulfilled!')
+    return redirect(url_for('sellerpage.seller', view='sold')) 
