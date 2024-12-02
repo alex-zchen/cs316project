@@ -109,58 +109,59 @@ LIMIT :k
             return [Product(*row) for row in rows]
 
     @staticmethod
-    def search_and_filter(search_query=None, sort_by='id', sort_order='desc', page=1, per_page=4):
+    def search_and_filter(search_query, sort_by, sort_order, category, page, per_page):
         # Base query with ratings
         query = '''
             WITH avg_ratings AS (
                 SELECT pid, 
-                       AVG(rscore)::NUMERIC(10,1) as avg_rating,
+                       COALESCE(AVG(rscore)::NUMERIC(10,1), 0) as avg_rating,
                        COUNT(*) as review_count
                 FROM ProductReviews
                 WHERE for_seller = FALSE
                 GROUP BY pid
             )
-            SELECT p.id, p.name, p.seller_id, p.price, p.available, 
-                   p.description, p.category_id, p.image_url,
+            SELECT p.id, 
+                   p.name, 
+                   p.seller_id, 
+                   COALESCE(p.price, 0) as price, 
+                   COALESCE(p.available, false) as available, 
+                   p.description, 
+                   p.category_id, 
+                   p.image_url,
                    COALESCE(r.avg_rating, 0) as avg_rating,
-                   COALESCE(r.review_count, 0) as review_count
+                   COALESCE(r.review_count, 0) as review_count,
+                   COALESCE(p.quantity, 0) as quantity
             FROM Products p
             LEFT JOIN avg_ratings r ON p.id = r.pid
-            WHERE p.available = TRUE
+            WHERE 1=1
         '''
+        params = {}
 
-        # Add search conditions if search query exists
+        # Add search condition if search query exists
         if search_query:
-            query += '''
-                AND (
-                    p.id::text = :search
-                    OR p.name ILIKE :search_like
-                    OR p.description ILIKE :search_like
-                )
-            '''
-            rows = app.db.execute(query,
-                                search=search_query,
-                                search_like=f'%{search_query}%',
-                                limit=per_page,
-                                offset=(page - 1) * per_page)
+            query += ' AND (LOWER(p.name) LIKE LOWER(:search) OR LOWER(COALESCE(p.description, \'\')) LIKE LOWER(:search))'
+            params['search'] = f'%{search_query}%'
+
+        # Add category filter if specified
+        if category and category != 'all':
+            query += ' AND p.category_id = :category'
+            params['category'] = category
+
+        # Add sorting
+        if sort_by == 'price':
+            query += f' ORDER BY price {sort_order}'
+        elif sort_by == 'rating':
+            query += f' ORDER BY avg_rating {sort_order}'
         else:
-            # Add sorting
-            if sort_by == 'price' and sort_order in ['asc', 'desc']:
-                query += f' ORDER BY p.price {sort_order.upper()}'
-            elif sort_by == 'rating' and sort_order in ['asc', 'desc']:
-                query += f' ORDER BY avg_rating {sort_order.upper()} NULLS LAST'
-            else:
-                query += f' ORDER BY p.id {sort_order.upper()}'
+            query += f' ORDER BY p.id {sort_order}'
 
-            # Add pagination
-            query += ' LIMIT :limit OFFSET :offset'
-            
-            rows = app.db.execute(query,
-                                limit=per_page,
-                                offset=(page - 1) * per_page)
+        # Add pagination
+        query += ' LIMIT :per_page OFFSET :offset'
+        params['per_page'] = per_page
+        params['offset'] = (page - 1) * per_page
 
+        rows = app.db.execute(query, **params)
         return [Product(*row) for row in rows]
-
 
     @staticmethod
     def get_filtered_count(search_query=None):
@@ -213,3 +214,29 @@ RETURNING id
         except Exception as e:
             print(str(e))
             return None
+
+    @staticmethod
+    def get_all_categories():
+        rows = app.db.execute('''
+            SELECT DISTINCT category_id
+            FROM Products
+            WHERE category_id IS NOT NULL
+            ORDER BY category_id
+        ''')
+        return [row[0] for row in rows]
+
+    @staticmethod
+    def get_filtered_count(search_query, category=None):
+        query = 'SELECT COUNT(*) FROM Products WHERE 1=1'
+        params = {}
+
+        if search_query:
+            query += ' AND (LOWER(name) LIKE LOWER(:search) OR LOWER(description) LIKE LOWER(:search))'
+            params['search'] = f'%{search_query}%'
+
+        if category and category != 'all':
+            query += ' AND category_id = :category'
+            params['category'] = category
+
+        count = app.db.execute(query, **params)
+        return count[0][0]

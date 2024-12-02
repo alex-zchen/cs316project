@@ -97,12 +97,24 @@
 
                     <!-- Add to Cart Button -->
                     {% if product.available %}
-                    <form action="{{ url_for('products.add_to_cart', product_id=product.id) }}" method="POST" class="mt-4">
-                        <button type="submit" 
-                                class="bg-black text-white px-6 py-2 rounded-md hover:bg-gray-800 transition-colors">
-                            Add to Cart
+                        {% if current_user.is_authenticated %}
+                            <form action="{{ url_for('products.add_to_cart', product_id=product.id) }}" method="POST" class="mt-4">
+                                <button type="submit" 
+                                        class="bg-black text-white px-6 py-2 rounded-md hover:bg-gray-800 transition-colors">
+                                    Add to Cart
+                                </button>
+                            </form>
+                        {% else %}
+                            <a href="{{ url_for('users.login') }}" 
+                               class="inline-block bg-black text-white px-6 py-2 rounded-md hover:bg-gray-800 transition-colors">
+                                Login to Add to Cart
+                            </a>
+                        {% endif %}
+                    {% else %}
+                        <button disabled 
+                                class="bg-gray-400 text-white px-6 py-2 rounded-md cursor-not-allowed">
+                            Out of Stock
                         </button>
-                    </form>
                     {% endif %}
                 </div>
 
