@@ -39,3 +39,20 @@ def carts():
                            length = len(user_cart),
                            names = [Product.get(i.pid).name for i in user_cart])
 
+@bp.route('/delete/<int:uid>/<int:pid>', methods=['POST'])
+def delete(uid, pid):
+    # userid
+    user_cart = {}
+    userid = current_user.id
+    # find total price and cart:
+    if(current_user.is_authenticated):
+        user_cart = Cart.get(userid)
+    total_price = Cart.get_total_price(userid)
+    if request.method == "POST":
+        try:
+            Cart.remCart(uid, pid)
+            flash("Item Removed Successfully!")
+            return redirect(url_for('carts.carts'))
+        except:
+            flash("Error: Could Not Remove Item From Cart")
+            return redirect(url_for('carts.carts'))
