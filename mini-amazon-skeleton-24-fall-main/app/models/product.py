@@ -133,7 +133,8 @@ LIMIT :k
                    COALESCE(p.quantity, 0) as quantity
             FROM Products p
             LEFT JOIN avg_ratings r ON p.id = r.pid
-            WHERE 1=1
+            WHERE p.available = TRUE
+            AND COALESCE(p.quantity, 0) > 0
         '''
         params = {}
 
@@ -164,28 +165,25 @@ LIMIT :k
         return [Product(*row) for row in rows]
 
     @staticmethod
-    def get_filtered_count(search_query=None):
+    def get_filtered_count(search_query, category=None):
         query = '''
             SELECT COUNT(*)
             FROM Products p
-            WHERE available = TRUE
+            WHERE p.available = TRUE
+            AND COALESCE(p.quantity, 0) > 0
         '''
+        params = {}
 
         if search_query:
-            query += '''
-                AND (
-                    p.id::text = :search
-                    OR p.name ILIKE :search_like
-                    OR p.description ILIKE :search_like
-                )
-            '''
-            rows = app.db.execute(query,
-                                search=search_query,
-                                search_like=f'%{search_query}%')
-        else:
-            rows = app.db.execute(query)
+            query += ' AND (LOWER(name) LIKE LOWER(:search) OR LOWER(description) LIKE LOWER(:search))'
+            params['search'] = f'%{search_query}%'
 
-        return rows[0][0] if rows is not None else 0
+        if category and category != 'all':
+            query += ' AND category_id = :category'
+            params['category'] = category
+
+        count = app.db.execute(query, **params)
+        return count[0][0]
 
     @staticmethod
     def list_product(name, seller_id, price, description=None, category_id=None, image_url=None, quantity=1):
