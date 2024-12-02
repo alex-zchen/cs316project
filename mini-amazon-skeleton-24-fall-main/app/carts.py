@@ -56,3 +56,18 @@ def delete(uid, pid):
         except:
             flash("Error: Could Not Remove Item From Cart")
             return redirect(url_for('carts.carts'))
+
+@bp.route('/plus/<int:pid>/<int:quant>', methods=['POST'])
+def plus(pid, quant):
+    try:
+        Cart.upQuant(current_user.id, pid, quant)
+        return redirect(url_for('carts.carts'))
+    except:
+        return redirect(url_for('carts.carts'))
+@bp.route('/minus/<int:pid>/<int:quant>', methods=['POST'])
+def minus(pid, quant):
+    try: 
+        Cart.lowQuant(current_user.id, pid, quant)
+        return redirect(url_for('carts.carts'))
+    except:
+        return redirect(url_for('carts.carts'))

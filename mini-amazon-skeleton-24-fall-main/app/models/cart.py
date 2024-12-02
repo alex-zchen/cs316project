@@ -84,7 +84,29 @@ class Cart:
         uid=uid, pid=pid)
         return Cart.get
 
-            
+    @staticmethod
+    def upQuant(uid, pid, quant):
+        rows = app.db.execute("""
+                UPDATE Carts
+                SET quant = quant + 1
+                WHERE uid = :uid AND pid = :pid
+                """,
+                uid=uid, pid=pid, quant=quant)
+        return None
+    
+    @staticmethod
+    def lowQuant(uid, pid, quant):
+        if(quant>1):
+            try:
+                rows = app.db.execute("""
+                UPDATE Carts
+                SET quant = quant -1
+                WHERE uid = :uid AND pid = :pid
+                """,
+                uid=uid, pid=pid, quant=quant)
+            except:
+                flash("Error: Could not decrease quantity")
+        return None
 
     @staticmethod
     def buy_cart(uid):
