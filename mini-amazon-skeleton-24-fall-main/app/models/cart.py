@@ -2,7 +2,6 @@ from flask import current_app as app
 from flask_login import current_user
 from datetime import datetime 
 
-promo = False
 class Cart:
     
     def __init__(self, id, uid, pid, quant):
@@ -10,7 +9,6 @@ class Cart:
         self.uid = uid
         self.pid = pid
         self.quant = quant
-        self.promo = False
 
     @staticmethod
     def get(uid):
@@ -43,8 +41,6 @@ class Cart:
             WHERE c.uid = :uid;
             """,
             uid=uid)
-            if(promo == True):
-                return (rows[0][0]) - (0.1)*(rows[0][0])
             return rows[0][0]
     
     @staticmethod
@@ -114,33 +110,64 @@ class Cart:
         return None
 
     @staticmethod
-    def use_promo():
-        promo = True
-    
-    @staticmethod
-    def remove_promo():
-        promo = False
+    def apply_coupon(uid, code):
+        try:
+            # Check if coupon exists and get discount
+            coupon = app.db.execute('''
+                SELECT discount_percent
+                FROM Coupons
+                WHERE code = :code
+            ''', code=code)
+            
+            if not coupon:
+                return False
+            
+            # Store the active coupon for the user
+            app.db.execute('''
+                UPDATE Users
+                SET active_coupon = :code
+                WHERE id = :uid
+            ''', code=code, uid=uid)
+            
+            return True
+        except Exception as e:
+            print(f"Error applying coupon: {e}")
+            return False
 
     @staticmethod
-    def get_promo():
-        return promo
+    def get_active_discount(uid):
+        try:
+            result = app.db.execute('''
+                SELECT c.discount_percent
+                FROM Users u
+                JOIN Coupons c ON u.active_coupon = c.code
+                WHERE u.id = :uid
+            ''', uid=uid)
+            
+            if result:
+                return {'percent': result[0][0]}
+            return None
+        except Exception as e:
+            print(f"Error getting discount: {e}")
+            return None
 
     @staticmethod
     def buy_cart(uid):
         current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         
         try:
-            # First check if user has enough balance
+            # Get total price and apply discount
             total_price = Cart.get_total_price(uid)
-            if(promo):
-                total_price = total_price - ((0.1)*total_price)
-                promo = False
             if total_price == 0:
                 return None
             
+            discount_info = Cart.get_active_discount(uid)
+            if discount_info:
+                total_price = total_price * (1 - discount_info['percent'] / 100)
+            
             if current_user.balance < total_price:
                 return None
-
+            
             # Check if all products have sufficient quantity
             insufficient_quantity = app.db.execute("""
                 SELECT *
@@ -194,6 +221,13 @@ class Cart:
                     WHERE uid = :uid
                 """, 
                 uid=uid)
+
+                # Clear the active coupon after purchase
+                app.db.execute('''
+                    UPDATE Users
+                    SET active_coupon = NULL
+                    WHERE id = :uid
+                ''', uid=uid)
 
                 # Return the IDs of the purchases made
                 return [row[0] for row in rows]

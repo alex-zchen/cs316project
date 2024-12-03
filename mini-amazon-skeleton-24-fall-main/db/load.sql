@@ -42,3 +42,5 @@ SELECT pg_catalog.setval('public.users_id_seq',
 SELECT pg_catalog.setval('public.orders_id_seq',
                          (SELECT MAX(id)+1 FROM Orders),
                          false);
+
+\COPY Coupons FROM 'Coupons.csv' WITH DELIMITER ',' NULL '' CSV

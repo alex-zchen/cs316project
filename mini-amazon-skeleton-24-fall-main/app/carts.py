@@ -28,23 +28,23 @@ class PromoForm(FlaskForm):
 @bp.route('/carts', methods=['GET', 'POST'])
 def carts():
     # userid
-    global coupon
-    form = PromoForm()
     user_cart = {}
     userid = current_user.id
     # find total price and cart:
     if(current_user.is_authenticated):
         user_cart = Cart.get(userid)
     total_price = Cart.get_total_price(userid)
-    if(coupon == True):
-        total_price= float(total_price) - float(0.1) * float(total_price)
 
+    # Get coupon discount if any
+    discount_info = Cart.get_active_discount(userid)
+    discount_percent = discount_info['percent'] if discount_info else None
+    discount_amount = (total_price * discount_percent / 100) if discount_percent else 0
+    final_total = total_price - discount_amount
+    
     if request.method == 'POST':
         # Call the buy_cart method to move items from cart to purchases
         purchase_ids = Cart.buy_cart(userid)
         if purchase_ids:
-            coupon = False
-            Cart.remove_promo()
             flash('Successfully Purchased Items. You can view your purchase history in your profile page.')
         else:
             flash('An error occurred while purchasing items. You might not have enough balance or the products you want to buy might not have enough quantity.')
@@ -56,10 +56,12 @@ def carts():
     return render_template('carts.html',
                            ucart=user_cart,
                            total="{:.2f}".format(total_price), 
+                           discount_percent=discount_percent,
+                           discount_amount="{:.2f}".format(discount_amount),
+                           final_total="{:.2f}".format(final_total),
                            prices = [Product.get(i.pid).price for i in user_cart], 
                            length = len(user_cart),
-                           names = [Product.get(i.pid).name for i in user_cart],
-                           form = form)
+                           names = [Product.get(i.pid).name for i in user_cart])
 
 @bp.route('/delete/<int:uid>/<int:pid>', methods=['POST'])
 def delete(uid, pid):
@@ -95,13 +97,15 @@ def minus(pid, quant):
     except:
         return redirect(url_for('carts.carts'))
 
-@bp.route('/coupon', methods=['POST'])
-def coupon():
-    global coupon
-    if(request.form.get('discount') == 'HAPPY'):
-        coupon = True
-        Cart.use_promo()
-        flash("Promo Code Successful!")
+@bp.route('/apply_coupon', methods=['POST'])
+def apply_coupon():
+    if not current_user.is_authenticated:
+        return redirect(url_for('users.login'))
+    
+    coupon_code = request.form.get('coupon_code')
+    if Cart.apply_coupon(current_user.id, coupon_code):
+        flash('Coupon applied successfully!')
     else:
-        flash("Promo code not valid")
+        flash('Invalid coupon code.')
     return redirect(url_for('carts.carts'))
+

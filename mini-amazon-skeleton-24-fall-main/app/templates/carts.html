@@ -53,33 +53,37 @@
   <thead class="thead-dark">
     <tr>
       <th scope="col">Total Price</th>
+      {% if discount_percent %}
+        <th scope="col">Discount ({{discount_percent}}%)</th>
+      {% endif %}
+      <th scope="col">Final Price</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <th scope="col">${{total}}</th>
+      {% if discount_percent %}
+        <th scope="col">-${{discount_amount}}</th>
+      {% endif %}
+      <th scope="col">${{final_total}}</th>
     </tr>
   </tbody>
 </table>
 
-<!-- Form for moving cart items to purchases -->
-  <form action="{{ url_for('carts.carts') }}" method="POST" class="mt-3">
-    <button type="submit" class="btn btn-primary">
-      Buy Items!
-    </button>
-  </form>
+<!-- Coupon Form -->
+<form action="{{ url_for('carts.apply_coupon') }}" method="POST" class="mt-3">
+  <div class="input-group mb-3" style="max-width: 300px;">
+    <input type="text" name="coupon_code" class="form-control" placeholder="Enter coupon code">
+    <div class="input-group-append">
+      <button type="submit" class="btn btn-secondary">Apply Coupon</button>
+    </div>
+  </div>
+</form>
 
-  <form action="{{ url_for('carts.coupon') }}" method="POST">
-    {{ form.hidden_tag() }}
-    <p>
-      {{ form.discount.label }}<br/>
-      {{ form.discount(size=32) }}<br/>
-      {% for error in form.discount.errors %}
-      <span style="color: red;">[{{ error }}]</span>
-      {% endfor %}
-    </p>
-    <p><button type="submit">Use Promo Code</button></p>
-  </form>
+<!-- Buy Items Button -->
+<form action="{{ url_for('carts.carts') }}" method="POST" class="mt-3">
+  <button type="submit" class="btn btn-primary">Buy Items!</button>
+</form>
 {% else %}
 <p><a href="{{ url_for('users.login') }}">Log in</a> to see your purchase history!</p>
 {% endif %}
