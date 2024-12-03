@@ -8,6 +8,9 @@ from datetime import datetime
 from .models.user import User
 from .models.purchase import Purchase
 from .models.product import Product
+import base64
+import io
+import matplotlib.pyplot as plt
 
 from flask import Blueprint
 bp = Blueprint('users', __name__)
@@ -74,46 +77,14 @@ def updateInfo():
     current_user.address = address if address else current_user.address
     current_user.balance = balance if balance else current_user.balance
     current_user.update_info(id = current_user.id, email = current_user.email, firstname = current_user.firstname, lastname = current_user.lastname, balance = current_user.balance, password = current_user.password, address = current_user.address)
-    login()
-    user = current_user
-    purchases = Purchase.get_all_by_uid_since(uid = user.id, since = -1)
-    print(user.id)
-    productPurchases = []
-    #Loading purchases in
-    for i, purchase in enumerate(purchases):
-        product = Product.get(purchase.pid)
-        purchaseObj = {}
-        purchaseObj['PurchaseDate'] = purchase.time_purchased
-        purchaseObj["ProductName"] = product.name
-        purchaseObj['Amount Paid'] = product.price
-        purchaseObj['Fulfillment Status'] = "Not yet shipped" if not purchase.fulfilled else "Shipped"
-        productPurchases.append(purchaseObj)
-
-
-    #Organizing pages into groups of 5
-    page_size = 5 
-    productPurchasePages = []
-
-    for i in range(0, len(productPurchases), page_size):
-        page = productPurchases[i:i + page_size]
-        productPurchasePages.append(page)
-    
-    #Handle no purchases
-    if(len(productPurchasePages) == 0):
-        productPurchasePages = [[]]
-
-    #Put up profile.html
-    return render_template('profile.html', user = current_user, purchases = productPurchasePages)
-
-@bp.route("/profile", methods=["GET"]) 
-#Displays the profile page, showing their info (editable) and their previous purchases in reverse chronological order.
-def profileDisplay():
+    login()    
     user = current_user
     purchases = Purchase.get_all_by_uid_since(uid = user.id, since = -1)
     
     # Group purchases by timestamp
     orders = {}
-    for purchase in purchases:
+    cumulative_total = 0
+    for purchase in reversed(purchases):
         product = Product.get(purchase.pid)
         timestamp = purchase.time_purchased
         
@@ -127,12 +98,32 @@ def profileDisplay():
         
         orders[timestamp]['total'] += float(product.price)
         orders[timestamp]['count'] += 1
+        cumulative_total += float(product.price)
+        print(cumulative_total)
+        orders[timestamp]['cumulative_total'] = cumulative_total
     
     # Convert to list and sort by timestamp
     order_list = list(orders.values())
     order_list.sort(key=lambda x: x['timestamp'], reverse=True)
     
-    # Paginate orders
+    # Create graph data object to show cumulative spend
+    graph_data = {
+        'x': [order['timestamp'] for order in order_list],
+        'y': [order['cumulative_total'] for order in order_list]
+    }
+    
+    #Generate and save a base64 encoded graph of the cumulative spend over time
+    plt.figure(figsize=(10, 5))
+    plt.plot(graph_data['x'], graph_data['y'], marker='o')
+    plt.xlabel('Date')
+    plt.ylabel('Spent ($)')
+    plt.title('Cumulative Purchases')
+    buf = io.BytesIO()
+    plt.savefig(buf, format='png')
+    graph_base64 = base64.b64encode(buf.getvalue()).decode('utf-8')
+    buf.close()
+    
+    # Paginate orders with page size of 5
     page_size = 5 
     order_pages = []
     for i in range(0, len(order_list), page_size):
@@ -142,7 +133,67 @@ def profileDisplay():
     if len(order_pages) == 0:
         order_pages = [[]]
 
-    return render_template('profile.html', user=user, orders=order_pages)
+    return render_template('profile.html', user=user, orders=order_pages, graph_data=graph_base64)
+
+@bp.route("/profile", methods=["GET"]) 
+#Displays the profile page, showing their info (editable) and their previous purchases in reverse chronological order.
+def profileDisplay():
+    user = current_user
+    purchases = Purchase.get_all_by_uid_since(uid = user.id, since = -1)
+    
+    # Group purchases by timestamp
+    orders = {}
+    cumulative_total = 0
+    for purchase in reversed(purchases):
+        product = Product.get(purchase.pid)
+        timestamp = purchase.time_purchased
+        
+        if timestamp not in orders:
+            orders[timestamp] = {
+                'total': 0,
+                'count': 0,
+                'timestamp': timestamp,
+                'uid': user.id
+            }
+        
+        orders[timestamp]['total'] += float(product.price)
+        orders[timestamp]['count'] += 1
+        cumulative_total += float(product.price)
+        print(cumulative_total)
+        orders[timestamp]['cumulative_total'] = cumulative_total
+    
+    # Convert to list and sort by timestamp
+    order_list = list(orders.values())
+    order_list.sort(key=lambda x: x['timestamp'], reverse=True)
+    
+    # Create graph data object to show cumulative spend
+    graph_data = {
+        'x': [order['timestamp'] for order in order_list],
+        'y': [order['cumulative_total'] for order in order_list]
+    }
+    
+    #Generate and save a base64 encoded graph of the cumulative spend over time
+    plt.figure(figsize=(10, 5))
+    plt.plot(graph_data['x'], graph_data['y'], marker='o')
+    plt.xlabel('Date')
+    plt.ylabel('Spent ($)')
+    plt.title('Cumulative Purchases')
+    buf = io.BytesIO()
+    plt.savefig(buf, format='png')
+    graph_base64 = base64.b64encode(buf.getvalue()).decode('utf-8')
+    buf.close()
+    
+    # Paginate orders with page size of 5
+    page_size = 5 
+    order_pages = []
+    for i in range(0, len(order_list), page_size):
+        page = order_list[i:i + page_size]
+        order_pages.append(page)
+    
+    if len(order_pages) == 0:
+        order_pages = [[]]
+
+    return render_template('profile.html', user=user, orders=order_pages, graph_data=graph_base64)
 
 #Log the user in by validating their email using password hashing (inspired by mini amazon skeleton).
 @bp.route('/login', methods=['GET', 'POST'])
