@@ -2,45 +2,294 @@
 
 {% block content %}
 
+<style>
+
+    /* View toggle styles */
+    .view-toggle {
+        margin: 30px 0;
+        text-align: center;
+    }
+    
+    .view-toggle a {
+        padding: 10px 20px;
+        text-decoration: none;
+        color: #555;
+        border: 1px solid #ddd;
+        margin-right: 10px;
+        border-radius: 6px;
+        transition: all 0.3s ease;
+    }
+    
+    .view-toggle a:hover {
+        background-color: #f8f9fa;
+    }
+    
+    .view-toggle a.active {
+        background-color: #3498db;
+        color: white;
+        border-color: #3498db;
+    }
+
+    /* Form styles */
+    .form-group {
+        margin-bottom: 25px;
+    }
+
+    .form-control {
+        border-radius: 6px;
+        border: 1px solid #ddd;
+        padding: 10px 15px;
+        transition: border-color 0.3s ease;
+    }
+
+    .form-control:focus {
+        border-color: #3498db;
+        box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+    }
+
+    .btn-primary {
+        background-color: #3498db;
+        border-color: #3498db;
+        padding: 10px 25px;
+        border-radius: 6px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        background-color: #2980b9;
+        border-color: #2980b9;
+    }
+
+    /* Alert styles */
+    .alert {
+        border-radius: 6px;
+        padding: 15px 20px;
+        margin-bottom: 20px;
+        border: none;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .alert-info {
+        background-color: #d1ecf1;
+        color: #0c5460;
+    }
+
+    /* Add these new styles */
+    .collapse-button {
+        width: 100%;
+        padding: 15px;
+        background-color: #3498db;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-size: 1.1rem;
+        margin: 20px 0;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    .collapse-button:hover {
+        background-color: #2980b9;
+    }
+
+    .collapse-content {
+        display: none;
+        padding: 20px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        margin-bottom: 20px;
+    }
+
+    .collapse-content.show {
+        display: block;
+    }
+
+    /* Add these pagination styles */
+    .pagination {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 30px 0;
+        gap: 8px;
+    }
+
+    .page-button {
+        padding: 8px 16px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        text-decoration: none;
+        color: #555;
+        transition: all 0.3s ease;
+    }
+
+    .page-button:hover {
+        background-color: #f8f9fa;
+        border-color: #3498db;
+        color: #3498db;
+    }
+
+    .page-button.active-page {
+        background-color: #3498db;
+        border-color: #3498db;
+        color: white;
+    }
+</style>
+
 <br><br>
 
-<h2>Your products for sale:</h2>
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-info" role="alert">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+
+<div class="view-toggle">
+  <a href="{{ url_for('sellerpage.seller', view='current') }}" 
+     class="{% if view_type == 'current' or not view_type %}active{% endif %}">
+      Current Listings
+  </a>
+  <a href="{{ url_for('sellerpage.seller', view='sold') }}" 
+     class="{% if view_type == 'sold' %}active{% endif %}">
+      Sold Products
+  </a>
+</div>
+
+<h2>{% if view_type == 'sold' %}Your Sold Products:{% else %}Your Products for Sale:{% endif %}</h2>
 <table class='table table-hover table-bordered container'>
-  <thead class="thead-dark">
+<thead class="thead-dark">
+  <tr>
+    {% if view_type == 'sold' %}
+    <th scope="col">Purchase ID</th>
+    {% endif %}
+    <th scope="col">Product ID</th>
+    <th scope="col">Product Name</th>
+    <th scope="col">Price</th>
+    {% if view_type != 'sold' %}
+    <th scope="col">Quantity</th>
+    <th scope="col">Update Quantity</th>
+    {% endif %}
+    {% if view_type == 'sold' %}
+    <th scope="col">Buyer ID</th>
+    <th scope="col">Purchase Date</th>
+    <th scope="col">Fulfillment Status</th>
+    {% endif %}
+  </tr>
+</thead>
+<tbody>
+  {% for product in products_in_inventory[request.args.get('page', 0)|int] %}
     <tr>
-      <th scope="col">Product ID</th>
-      <th scope="col">Product Name</th>
-      <th scope="col">Price</th>
+      {% if view_type == 'sold' %}
+      <td>{{product.purchase_id}}</td>
+      {% endif %}
+      <th scope="row">{{product.id}}</th>
+      <td>{{product.name}}</td>
+      <td>{{product.price}}</td>
+      {% if view_type != 'sold' %}
+      <td>{{product.quantity}}</td>
+      <td>
+        <form action="{{ url_for('sellerpage.update_quantity', product_id=product.id) }}" method="post" style="display: inline;">
+          <input type="number" name="new_quantity" value="{{product.quantity}}" min="0" style="width: 70px;">
+          <input type="submit" value="Update" class="btn btn-sm btn-primary">
+        </form>
+      </td>
+      {% endif %}
+      {% if view_type == 'sold' %}
+      <td>{{product.buyer_id}}</td>
+      <td>{{product.time_purchased}}</td>
+      <td>
+        {% if product.fulfilled %}
+          <span class="badge badge-success">Fulfilled</span>
+        {% else %}
+          <form action="{{ url_for('sellerpage.update_fulfillment', purchase_id=product.purchase_id) }}" method="post" style="display: inline;">
+            <button type="submit" class="btn btn-sm btn-warning">
+              Mark as Fulfilled
+            </button>
+          </form>
+        {% endif %}
+      </td>
+      {% endif %}
     </tr>
-  </thead>
-  <tbody>
-    {% for product in products_in_inventory%}
-      <tr>
-        <th scope="row">{{product.id}}</th>
-        <td>{{product.name}}</td>
-        <td>{{product.price}}</td>
-      </tr>
-    {% endfor %}
-  </tbody>
+  {% endfor %}
+</tbody>
 </table>
 
-<form action="" method="post">
-  {{ form.hidden_tag() }}
-  <p>
-    {{ form.product_name.label }}<br/>
-    {{ form.product_name(size=32) }}<br/>
-    {% for error in form.product_name.errors %}
-    <span style="color: red;">[{{ error }}]</span>
-    {% endfor %}
-  </p>
-  <p>
-    {{ form.price.label }}<br/>
-    {{ form.price(size=32) }}<br/>
-    {% for error in form.price.errors %}
-    <span style="color: red;">[{{ error }}]</span>
-    {% endfor %}
-  </p>
-  <p>{{ form.submit() }}</p>
-</form>
+<div class="pagination">
+  {% for i in range(products_in_inventory|length) %}
+  <a href="{{ url_for('sellerpage.seller', view=view_type, page=i) }}" 
+     class="page-button {% if i == request.args.get('page', 0)|int %}active-page{% endif %}">
+      {{ i + 1 }}
+  </a>
+  {% endfor %}
+</div>
 
-{% endblock %}
+{% if view_type != 'sold' %}
+<button class="collapse-button" onclick="toggleForm()">List New Item</button>
+
+<div id="listingForm" class="collapse-content">
+    <form action="" method="post">
+        {{ form.hidden_tag() }}
+        <div class="form-group">
+            {{ form.product_name.label }}<br/>
+            {{ form.product_name(size=32, class="form-control") }}<br/>
+            {% for error in form.product_name.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </div>
+
+        <div class="form-group">
+            {{ form.price.label }}<br/>
+            {{ form.price(size=32, class="form-control") }}<br/>
+            {% for error in form.price.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </div>
+
+        <div class="form-group">
+            {{ form.description.label }}<br/>
+            {{ form.description(rows=4, class="form-control") }}<br/>
+            {% for error in form.description.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </div>
+
+        <div class="form-group">
+            {{ form.category_id.label }}<br/>
+            {{ form.category_id(class="form-control") }}<br/>
+            {% for error in form.category_id.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </div>
+
+        <div class="form-group">
+            {{ form.image_url.label }}<br/>
+            {{ form.image_url(size=32, class="form-control") }}<br/>
+            {% for error in form.image_url.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </div>
+
+        <div class="form-group">
+            {{ form.quantity.label }}<br/>
+            {{ form.quantity(size=32, class="form-control") }}<br/>
+            {% for error in form.quantity.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </div>
+
+        <p>{{ form.submit(class="btn btn-primary") }}</p>
+    </form>
+</div>
+
+<script>
+function toggleForm() {
+    const form = document.getElementById('listingForm');
+    form.classList.toggle('show');
+}
+</script>
+{% endif %}
+
+{% endblock %} 

@@ -44,14 +44,37 @@ class Cart:
     
     @staticmethod
     def addCart(uid, pid, quant):
-        rows = app.db.execute("""
-        INSERT INTO Carts(uid, pid, quant)
-        VALUES(:uid, :pid, :quant)
-        RETURNING id
-        """,
-        uid=uid, pid=pid, quant=1)
-        return Cart.get
-
+        try:
+            # Check if item already exists in cart
+            existing_item = app.db.execute("""
+                SELECT id, quant
+                FROM Carts
+                WHERE uid = :uid AND pid = :pid
+            """,
+            uid=uid, pid=pid)
+            
+            if existing_item:
+                # Update quantity if item exists
+                app.db.execute("""
+                UPDATE Carts
+                SET quant = quant + :quant
+                WHERE uid = :uid AND pid = :pid
+                """,
+                uid=uid, pid=pid, quant=quant)
+            else:
+                # Insert new item if it doesn't exist
+                app.db.execute("""
+                INSERT INTO Carts(uid, pid, quant)
+                VALUES(:uid, :pid, :quant)
+                """,
+                uid=uid, pid=pid, quant=quant)
+            
+            return Cart.get(uid)
+        except Exception as e:
+            print(f"Error adding to cart: {e}")
+            return None
+    
+    @staticmethod
     def remCart(uid, pid):
         rows = app.db.execute("""
         DELETE 
@@ -60,14 +83,45 @@ class Cart:
         """,
         uid=uid, pid=pid)
         return Cart.get
-            
+
+    @staticmethod
+    def upQuant(uid, pid, quant):
+        rows = app.db.execute("""
+                UPDATE Carts
+                SET quant = quant + 1
+                WHERE uid = :uid AND pid = :pid
+                """,
+                uid=uid, pid=pid, quant=quant)
+        return None
+    
+    @staticmethod
+    def lowQuant(uid, pid, quant):
+        if(quant>1):
+            try:
+                rows = app.db.execute("""
+                UPDATE Carts
+                SET quant = quant -1
+                WHERE uid = :uid AND pid = :pid
+                """,
+                uid=uid, pid=pid, quant=quant)
+            except:
+                flash("Error: Could not decrease quantity")
+        return None
 
     @staticmethod
     def buy_cart(uid):
         current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         
         try:
-            # Step 1: Insert items from Cart to Purchases
+            # First check if user has enough balance
+            total_price = Cart.get_total_price(uid)
+            if total_price == 0:
+                return None
+            
+            if current_user.balance < total_price:
+                return None
+
+            # If balance is sufficient, proceed with purchase
             rows = app.db.execute("""
                 INSERT INTO Purchases (uid, pid, time_purchased)
                 SELECT uid, pid, :time_purchased
@@ -78,21 +132,33 @@ class Cart:
             uid=uid,
             time_purchased=current_time)
 
-            # Check if any items were moved
-            if not rows:
-                return None
-            app.db.execute("""
-                DELETE FROM Carts
-                WHERE uid = :uid
-            """, 
-            uid=uid)
-            
-            # Return the IDs of the purchases made
-            purchase_ids = [row[0] for row in rows]
-            return purchase_ids
+            # Update user balance and clear cart only if purchase was successful
+            if rows:
+                # Update user balance
+                new_balance = current_user.balance - total_price
+                current_user.update_info(
+                    id=current_user.id,
+                    email=current_user.email,
+                    firstname=current_user.firstname,
+                    lastname=current_user.lastname,
+                    balance=new_balance,
+                    password=current_user.password,
+                    address=current_user.address
+                )
+
+                # Remove items from cart
+                app.db.execute("""
+                    DELETE FROM Carts
+                    WHERE uid = :uid
+                """, 
+                uid=uid)
+
+                # Return the IDs of the purchases made
+                return [row[0] for row in rows]
+
+            return None
 
         except Exception as e:
-            # Handle any exceptions that occur and print the error for debugging
             print(f"Error moving cart to purchases: {e}")
             return None
 

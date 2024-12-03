@@ -7,7 +7,7 @@
   <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
   <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
   <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/example.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
   <style>
     body {
       font-family: "Lato", sans-serif;
@@ -43,33 +43,43 @@
       background-color: #000 !important;
       color: #fff;
     }
+
+    .header-btn {
+        background-color: #000000 !important;
+        color: #ffffff !important;
+        border-color: #000000;
+    }
+    
+    .header-btn:hover {
+        background-color: #333333 !important;
+        border-color: #333333;
+    }
   </style>
 </head>
 
 <body>
   <div class="sidenav">
     {% block msg %}
-    <a href="{{ url_for('index.index') }}" class="btn btn-black">
+    <a href="/" class="btn btn-black">
       <h1>Banana Pudding Bazaar</h1>
     </a>
         <div style="color: aliceblue; text-align: right; margin-bottom: 25px">
       {% if current_user.is_authenticated %}
-      Hello {{current_user.firstname}}! <a href="{{ url_for('users.logout') }}" type="button" class="btn btn-light">Log
+      Hello {{current_user.firstname}}! <a href="{{ url_for('users.logout') }}" type="button" class="btn header-btn">Log
         out</a>
-      <a href="{{ url_for('users.profileDisplay') }}" type="button" class="btn btn-light">
+      <a href="{{ url_for('users.profileDisplay') }}" type="button" class="btn header-btn">
         <i class="fa fa-user"></i> Profile
       </a>
-      <a href="{{ url_for('productreviewpage.productreviewpagebackend') }}" type="button" class="btn btn-light">Reviews
-        of
-        Products</a>
-      <a href="{{ url_for('sellerreviewpage.sellerreviewpagebackend') }}" type="button" class="btn btn-light">Reviews of
+      <a href="{{ url_for('productreviewpage.productreviewpagebackend') }}" type="button" class="btn header-btn">Reviews
+        of Products</a>
+      <a href="{{ url_for('sellerreviewpage.sellerreviewpagebackend') }}" type="button" class="btn header-btn">Reviews of
         Sellers</a>
-      <a href="{{ url_for('carts.carts') }}" type="button" class="btn btn-light">
+      <a href="{{ url_for('carts.carts') }}" type="button" class="btn header-btn">
         Cart
       </a>
-      <a href="{{ url_for('sellerpage.seller') }}" type="button" class="btn btn-secondary">Go to Your Seller Page</a>
+      <a href="{{ url_for('sellerpage.seller') }}" type="button" class="btn header-btn">Go to Your Seller Page</a>
       {% else %}
-      <a href="{{ url_for('users.login') }}" type="button" class="btn btn-light">Log in</a>
+      <a href="{{ url_for('users.login') }}" type="button" class="btn header-btn">Log in</a>
       {% endif %}
     </div>
     {% endblock %}
@@ -78,5 +88,6 @@
     {% block content %}{% endblock %}
   </div>
 </body>
+
 
 </html>

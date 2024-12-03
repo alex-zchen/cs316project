@@ -13,6 +13,7 @@ from wtforms.validators import ValidationError, DataRequired, Email, EqualTo
 from .models.productreview import AllReviews
 from datetime import datetime
 
+
 from flask import Blueprint
 bp = Blueprint('productreviewpage', __name__)
 
@@ -48,9 +49,20 @@ def productreviewpagebackend():
             previews = AllReviews.get_all_by_uid(current_user.id)
     else:
         previews = None
+    previewsPages = []
+    page_size = 5
+
+    for i in range(0, len(previews), page_size):
+        page = previews[i:i + page_size]
+        previewsPages.append(page)
+    
+    print(previewsPages)
+    if(len(previewsPages) == 0):
+        previewsPages = [[]]
+
     # render the page by adding information to the sellerreview.html file
     return render_template('productreview.html',
-                            previews=previews,
+                            previews=previewsPages,
                             form=form)
 
 @bp.route('/productreviewpage/delete/<int:product_id>', methods=['POST'])

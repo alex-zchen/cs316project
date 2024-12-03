@@ -23,7 +23,7 @@ class PurchaseForm(FlaskForm):
     pid = IntegerField('Product ID (NOT NAME!)', validators=[DataRequired()])
     submit = SubmitField('ADD TO CART')
 
-@bp.route('/', methods=['GET', 'POST'])
+@bp.route('/index', methods=['GET', 'POST'])
 def index():
     seller_id = request.args.get('seller_id')
     top_k = request.args.get('top_k')
@@ -46,6 +46,7 @@ def index():
             current_user.id, form.pid.data, 1
         ):
             return redirect(url_for('index.index'))
+    
 
     # find the products current user has bought:
 

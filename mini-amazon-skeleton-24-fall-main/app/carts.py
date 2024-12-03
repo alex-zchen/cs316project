@@ -24,9 +24,9 @@ def carts():
         # Call the buy_cart method to move items from cart to purchases
         purchase_ids = Cart.buy_cart(userid)
         if purchase_ids:
-            flash('Successfully moved items to Purchases.')
+            flash('Successfully Purchased Items. You can view your purchase history in your profile page.')
         else:
-            flash('No items in cart to move or an error occurred.')
+            flash('No items in cart to buy in cart, insufficient balance, or an error occurred.')
         
         return redirect(url_for('carts.carts'))
 
@@ -38,3 +38,36 @@ def carts():
                            prices = [Product.get(i.pid).price for i in user_cart], 
                            length = len(user_cart),
                            names = [Product.get(i.pid).name for i in user_cart])
+
+@bp.route('/delete/<int:uid>/<int:pid>', methods=['POST'])
+def delete(uid, pid):
+    # userid
+    user_cart = {}
+    userid = current_user.id
+    # find total price and cart:
+    if(current_user.is_authenticated):
+        user_cart = Cart.get(userid)
+    total_price = Cart.get_total_price(userid)
+    if request.method == "POST":
+        try:
+            Cart.remCart(uid, pid)
+            flash("Item Removed Successfully!")
+            return redirect(url_for('carts.carts'))
+        except:
+            flash("Error: Could Not Remove Item From Cart")
+            return redirect(url_for('carts.carts'))
+
+@bp.route('/plus/<int:pid>/<int:quant>', methods=['POST'])
+def plus(pid, quant):
+    try:
+        Cart.upQuant(current_user.id, pid, quant)
+        return redirect(url_for('carts.carts'))
+    except:
+        return redirect(url_for('carts.carts'))
+@bp.route('/minus/<int:pid>/<int:quant>', methods=['POST'])
+def minus(pid, quant):
+    try: 
+        Cart.lowQuant(current_user.id, pid, quant)
+        return redirect(url_for('carts.carts'))
+    except:
+        return redirect(url_for('carts.carts'))

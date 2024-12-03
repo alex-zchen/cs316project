@@ -1,8 +1,18 @@
 {% extends "base.html" %}
 
 {% block content %}
-
 <br><br>
+
+<!-- Add flash messages section -->
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-info" role="alert">
+        {{ message }}
+      </div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
 
 <h2>Your Cart:</h2>
 <br><br>
@@ -10,17 +20,31 @@
   <table class='table table-hover table-bordered container'>
     <thead class="thead-dark">
       <tr>
-        <th scope="col">Product ID</th>
+        <th scope="col">Product</th>
         <th scope="col">Quantity</th>
         <th scope="col">Price</th>
+        <th scope="col"> </th>
       </tr>
     </thead>
     <tbody>
       {% for i in range(length)%}
         <tr>
           <th>{{names[i]}}</th>
-          <td>{{ucart[i].quant}}</td>
+          <td>{{ucart[i].quant}} <form action="{{ url_for('carts.plus', pid=ucart[i].pid, quant=ucart[i].quant)}}" method="POST" class="mt-3">
+            <button type="submit" class="btn btn-primary">
+              +
+            </button>
+          </form> <form action="{{ url_for('carts.minus', pid=ucart[i].pid, quant=ucart[i].quant)}}" method="POST" class="mt-3">
+            <button type="submit" class="btn btn-primary">
+              -
+            </button>
+          </form></td>
           <td>${{prices[i]}}</td>
+          <td><form action="{{ url_for('carts.delete', uid=current_user.id, pid=ucart[i].pid) }}" method="POST" class="mt-3">
+            <button type="submit" class="btn btn-primary">
+              Remove from cart
+            </button>
+          </form></td>
         </tr>
       {% endfor %}
     </tbody>

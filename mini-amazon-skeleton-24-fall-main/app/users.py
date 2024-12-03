@@ -4,7 +4,7 @@ from flask_login import login_user, logout_user, current_user
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, DecimalField
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo
-
+from datetime import datetime
 from .models.user import User
 from .models.purchase import Purchase
 from .models.product import Product
@@ -73,15 +73,29 @@ def updateInfo():
     purchases = Purchase.get_all_by_uid_since(uid = user.id, since = -1)
     print(user.id)
     productPurchases = []
-    for purchase in purchases:
+    #Loading purchases in
+    for i, purchase in enumerate(purchases):
         product = Product.get(purchase.pid)
         purchaseObj = {}
         purchaseObj['PurchaseDate'] = purchase.time_purchased
         purchaseObj["ProductName"] = product.name
         purchaseObj['Amount Paid'] = product.price
-        purchaseObj['Fufillment Status'] = "Not yet shipped"
+        purchaseObj['Fulfillment Status'] = "Not yet shipped" if not purchase.fulfilled else "Shipped"
         productPurchases.append(purchaseObj)
-    return render_template('profile.html', user = current_user, purchases = productPurchases)
+
+
+    page_size = 5 
+    productPurchasePages = []
+
+    for i in range(0, len(productPurchases), page_size):
+        page = productPurchases[i:i + page_size]
+        productPurchasePages.append(page)
+    
+    print(productPurchasePages)
+    if(len(productPurchasePages) == 0):
+        productPurchasePages = [[]]
+
+    return render_template('profile.html', user = current_user, purchases = productPurchasePages)
 
 @bp.route("/profile", methods=["GET"]) 
 def profileDisplay():
@@ -89,20 +103,32 @@ def profileDisplay():
     purchases = Purchase.get_all_by_uid_since(uid = user.id, since = -1)
     print(user.id)
     productPurchases = []
-    for purchase in purchases:
+    #Loading purchases in
+    for i, purchase in enumerate(purchases):
         product = Product.get(purchase.pid)
         purchaseObj = {}
         purchaseObj['PurchaseDate'] = purchase.time_purchased
         purchaseObj["ProductName"] = product.name
         purchaseObj['Amount Paid'] = product.price
-        purchaseObj['Fufillment Status'] = "Not yet shipped"
+        purchaseObj['Fulfillment Status'] = "Not yet shipped" if not purchase.fulfilled else "Shipped"
         productPurchases.append(purchaseObj)
-    return render_template('profile.html', user=user, purchases=productPurchases)
+    page_size = 5 
+    productPurchasePages = []
+
+    for i in range(0, len(productPurchases), page_size):
+        page = productPurchases[i:i + page_size]
+        productPurchasePages.append(page)
+    
+    print(productPurchasePages)
+    if(len(productPurchasePages) == 0):
+        productPurchasePages = [[]]
+
+    return render_template('profile.html', user=user, purchases=productPurchasePages)
 
 @bp.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
-        return redirect(url_for('index.index'))
+        return redirect(url_for('products.product_list'))
     form = LoginForm()
     if form.validate_on_submit():
         user = User.get_by_auth(form.email.data, form.password.data)
@@ -112,7 +138,7 @@ def login():
         login_user(user)
         next_page = request.args.get('next')
         if not next_page or url_parse(next_page).netloc != '':
-            next_page = url_for('index.index')
+            next_page = url_for('products.product_list')
 
         return redirect(next_page)
     return render_template('login.html', title='Sign In', form=form)
@@ -137,7 +163,7 @@ class RegistrationForm(FlaskForm):
 @bp.route('/register', methods=['GET', 'POST'])
 def register():
     if current_user.is_authenticated:
-        return redirect(url_for('index.index'))
+        return redirect(url_for('products.product_list'))
     form = RegistrationForm()
     if form.validate_on_submit():
         if User.register(email = form.email.data,
@@ -151,7 +177,7 @@ def register():
 @bp.route('/logout')
 def logout():
     logout_user()
-    return redirect(url_for('index.index'))
+    return redirect(url_for('products.product_list'))
 
 
 @bp.route('/userpage')
