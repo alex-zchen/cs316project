@@ -19,7 +19,7 @@
         {% for purchase in purchases %}
         <tr>
             <td>{{ purchase.PurchaseDate }}</td>
-            <td>{{ purchase.ProductName }}</td>
+            <td><a href="{{ url_for('products.product_detail', product_id=purchase.ProductID) }}">{{ purchase.ProductName }}</a></td>
             <td>{{ purchase.Quantity }}</td>
             <td>${{ purchase.Amount_Paid }}</td>
             <td>{{ purchase.Fulfillment_Status }}</td>

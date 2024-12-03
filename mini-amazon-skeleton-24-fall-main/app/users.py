@@ -303,6 +303,7 @@ def order_page(uid, timestamp):
         purchaseObj = {}
         purchaseObj['PurchaseDate'] = purchase.time_purchased
         purchaseObj["ProductName"] = product.name
+        purchaseObj['ProductID'] = product.id
         purchaseObj['Quantity'] = purchase.quantity
         purchaseObj['Amount_Paid'] = "{:.2f}".format(price * purchase.quantity)
         purchaseObj['Fulfillment_Status'] = "Not yet shipped" if not purchase.fulfilled else "Shipped"

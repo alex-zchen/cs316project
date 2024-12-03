@@ -154,6 +154,24 @@
                     <!-- Reviews Section -->
                     <div class="mt-8">
                         <h2 class="text-xl font-semibold mb-4">Product Reviews</h2>
+                        {% if purchased %}
+                        <br>
+                        <p class="text-gray-600">
+                            <span class="font-semibold">Leave a Review: </span>
+                        </p>
+                        <form action="" method="post">
+                            {{ form.hidden_tag() }}
+                            <p>
+                                {{ form.rscore.label }}<br />
+                                {{ form.rscore(size=32) }}<br />
+                                {% for error in form.rscore.errors %}
+                                <span style="color: red;">[{{ error }}]</span>
+                                {% endfor %}
+                            </p>
+                            <p>{{ form.submit() }}</p>
+                        </form>
+                        {% endif %}
+
                         {% if reviews %}
                         <div class="space-y-4">
                             {% for review in reviews %}
