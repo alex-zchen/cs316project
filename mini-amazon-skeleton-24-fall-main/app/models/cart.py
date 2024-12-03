@@ -2,12 +2,15 @@ from flask import current_app as app
 from flask_login import current_user
 from datetime import datetime 
 
+promo = False
 class Cart:
+    
     def __init__(self, id, uid, pid, quant):
         self.id = id
         self.uid = uid
         self.pid = pid
         self.quant = quant
+        self.promo = False
 
     @staticmethod
     def get(uid):
@@ -40,7 +43,9 @@ class Cart:
             WHERE c.uid = :uid;
             """,
             uid=uid)
-        return rows[0][0]
+            if(promo == True):
+                return (rows[0][0]) - (0.1)*(rows[0][0])
+            return rows[0][0]
     
     @staticmethod
     def addCart(uid, pid, quant):
@@ -109,12 +114,27 @@ class Cart:
         return None
 
     @staticmethod
+    def use_promo():
+        promo = True
+    
+    @staticmethod
+    def remove_promo():
+        promo = False
+
+    @staticmethod
+    def get_promo():
+        return promo
+
+    @staticmethod
     def buy_cart(uid):
         current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         
         try:
             # First check if user has enough balance
             total_price = Cart.get_total_price(uid)
+            if(promo):
+                total_price = total_price - ((0.1)*total_price)
+                promo = False
             if total_price == 0:
                 return None
             

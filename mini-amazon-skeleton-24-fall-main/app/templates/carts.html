@@ -68,6 +68,18 @@
       Buy Items!
     </button>
   </form>
+
+  <form action="{{ url_for('carts.coupon') }}" method="POST">
+    {{ form.hidden_tag() }}
+    <p>
+      {{ form.discount.label }}<br/>
+      {{ form.discount(size=32) }}<br/>
+      {% for error in form.discount.errors %}
+      <span style="color: red;">[{{ error }}]</span>
+      {% endfor %}
+    </p>
+    <p><button type="submit">Use Promo Code</button></p>
+  </form>
 {% else %}
 <p><a href="{{ url_for('users.login') }}">Log in</a> to see your purchase history!</p>
 {% endif %}

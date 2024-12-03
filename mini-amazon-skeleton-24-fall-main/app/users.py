@@ -10,6 +10,7 @@ from .models.purchase import Purchase
 from .models.product import Product
 import base64
 import io
+import matplotlib
 import matplotlib.pyplot as plt
 
 from flask import Blueprint
