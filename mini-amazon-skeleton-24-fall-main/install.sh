@@ -15,7 +15,8 @@ DB_USER=${PGUSER}
 DB_PORT=${PGPORT}
 DB_HOST=${PGHOST}
 DB_PASSWORD=${PGPASSWORD}" > .flaskenv
-
+poetry add matplotlib
+poetry add base64
 poetry config virtualenvs.in-project true
 poetry install
 db/setup.sh

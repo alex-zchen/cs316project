@@ -177,7 +177,7 @@ def profileDisplay():
     plt.plot(graph_data['x'], graph_data['y'], marker='o')
     plt.xlabel('Date')
     plt.ylabel('Spent ($)')
-    plt.title('Cumulative Purchases')
+    plt.title('We go above and beyond to make your account history transparent. \n Here is a graph of your cumulative spend over time.')
     buf = io.BytesIO()
     plt.savefig(buf, format='png')
     graph_base64 = base64.b64encode(buf.getvalue()).decode('utf-8')
