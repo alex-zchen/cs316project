@@ -96,4 +96,17 @@ RETURNING id
         WHERE p.seller_id = :seller_id
         ORDER BY pu.time_purchased DESC
         ''', seller_id=seller_id)
-        return rows 
+        return rows
+
+    @staticmethod
+    def get_orders_by_time(uid, timestamp):
+        rows = app.db.execute('''
+        SELECT id, uid, pid, time_purchased, fulfilled
+        FROM Purchases
+        WHERE uid = :uid
+        AND time_purchased = :timestamp
+        ORDER BY time_purchased DESC
+        ''',
+        uid=uid,
+        timestamp=timestamp)
+        return [Purchase(*row) for row in rows]

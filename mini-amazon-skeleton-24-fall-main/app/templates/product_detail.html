@@ -84,12 +84,16 @@
                 <div class="mt-6 space-y-2">
                     <p class="text-gray-600">
                         <span class="font-semibold">Category:</span>
-                        {{ product.category_id if product.category_id else "Uncategorized" }}
+                        {{ Category.get_name(product.category_id) if product.category_id else "Uncategorized" }}
                     </p>
                     <p class="text-gray-600">
-                        <span class="font-semibold">Seller ID:</span>
-                        {{ product.seller_id }}
+                        <span class="font-semibold">Seller ID: (Click for more info)</span>
+                        <a href="{{ url_for('users.pubPage', user_id=product.seller_id) }}">{{product.seller_id }}</a>
                     </p>
+
+                    
+
+
                     <p class="text-gray-600">
                         <span class="font-semibold">Status:</span>
                         {% if product.available %}

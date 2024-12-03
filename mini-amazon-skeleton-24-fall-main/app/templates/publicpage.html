@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% block content %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!--Title for public profile page-->
+    <title>{{ user.firstname }} {{user.lastname}}'s Profile (Seller {{user.id}})</title>
+    <!-- Stylings for user info tables, same as profile.html-->
+    <style>
+        .profile-table {
+            width: 50%;
+            margin-top: 20px;
+        }
+        .table-container {
+            margin-left: 5%;
+            margin-top: 2%;
+            display: flex;
+            gap: 10%;
+        }
+        .profile-table {
+            margin-top: 20px;
+        }
+        .user-info {
+            width: 60%;
+        }
+        .purchases {
+            width: 30%;
+        }
+        .pagination {
+            margin-top: 15px;
+            justify-content: left;
+            gap: 10px;
+        }
+        .page-button {
+            padding: 2px 10px;
+            border: 1px solid #000000;
+            border-radius: 50%;
+            font-size: 0.9rem;
+            width: 30px;
+            height: 30px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .active-page {
+            background-color: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+    </style>
+</head>
+<body>
+    <!--Display public page header-->
+    <h1 style="margin-top: 5%; margin-left: 5%;">{{ user.firstname }} {{user.lastname}}'s Profile (Seller {{user.id}})</h1>
+    <!--Table for user info, same as profile.html-->
+    <div class="table-container">
+        <table class="table profile-table">
+            <thead class="thead-dark">
+                <tr>
+                    <th scope="col">Detail</th>
+                    <th scope="col">Your Info</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr></tr>
+                    <td>Seller ID</td>
+                    <td>{{ user.id }}</td>
+                </tr>
+                <tr>
+                    <td>Display Name</td>
+                    <td>{{ user.firstname }} {{ user.lastname }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>Customer Support Email</td>
+                    <td>{{ user.email }}</td>
+                </tr>
+                <tr>
+                    <td>Address for shipping labels and returns</td>
+                    <td>{{ user.address }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
+
+{% endblock %}

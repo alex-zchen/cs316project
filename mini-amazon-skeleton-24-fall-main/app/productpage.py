@@ -10,6 +10,7 @@ from .models.productreview import AllReviews
 from wtforms import StringField, IntegerField, BooleanField, SubmitField
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo
 from datetime import datetime
+from .models.category import Category
 
 bp = Blueprint('products', __name__)
 
@@ -58,6 +59,7 @@ def product_list():
                          category=category,
                          categories=categories)
 
+
 @bp.route('/products/<int:product_id>', methods=['GET', 'POST'])  # Changed from /product to /products
 def product_detail(product_id):
     product = Product.get(product_id)
@@ -74,20 +76,22 @@ def product_detail(product_id):
                     AllReviews.reviewProduct(current_user.id, 
                                     product_id, form.rscore.data, 
                                     datetime.now())
-                    return render_template('product_detail.html', product=product, purchased=True, form=form)
+                    return render_template('product_detail.html', product=product, purchased=True, form=form,
+                         Category=Category)
                 else:
                     AllReviews.update_rscore(current_user.id, 
                                     product_id, form.rscore.data, 
                                     datetime.now())
-                    return render_template('product_detail.html', product=product, purchased=True, form=form)
+                    return render_template('product_detail.html', product=product, purchased=True, form=form,
+                         Category=Category)
         if Purchase.if_purchased_item(current_user.id, product_id):
-            return render_template('product_detail.html', product=product, purchased=True, form=form)
-
-        
-    return render_template('product_detail.html', product=product, form=form)
+            return render_template('product_detail.html', product=product, purchased=True, form=form,
+                         Category=Category)
+    return render_template('product_detail.html', product=product, form=form,
+                         Category=Category)
 
 @bp.route('/products/<int:product_id>/add_to_cart', methods=['POST'])
-@login_required ##fix this so u cannot add to cart if not logged in
+@login_required
 def add_to_cart(product_id):
     Cart.addCart(current_user.id, product_id, 1)
     flash('Product added to cart successfully!', 'success')
