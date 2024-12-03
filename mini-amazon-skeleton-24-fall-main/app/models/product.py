@@ -29,7 +29,8 @@ WITH avg_ratings AS (
 SELECT p.id, p.name, p.seller_id, p.price, p.available, 
        p.description, p.category_id, p.image_url,
        COALESCE(r.avg_rating, 0) as avg_rating,
-       COALESCE(r.review_count, 0) as review_count
+       COALESCE(r.review_count, 0) as review_count,
+       COALESCE(p.quantity, 0) as quantity
 FROM Products p
 LEFT JOIN avg_ratings r ON p.id = r.pid
 WHERE p.id = :id
@@ -110,7 +111,6 @@ LIMIT :k
 
     @staticmethod
     def search_and_filter(search_query, sort_by, sort_order, category, page, per_page):
-        # Base query with ratings
         query = '''
             WITH avg_ratings AS (
                 SELECT pid, 
@@ -133,17 +133,16 @@ LIMIT :k
                    COALESCE(p.quantity, 0) as quantity
             FROM Products p
             LEFT JOIN avg_ratings r ON p.id = r.pid
+            LEFT JOIN Categories c ON p.category_id = c.id
             WHERE p.available = TRUE
             AND COALESCE(p.quantity, 0) > 0
         '''
         params = {}
 
-        # Add search condition if search query exists
         if search_query:
             query += ' AND (LOWER(p.name) LIKE LOWER(:search) OR LOWER(COALESCE(p.description, \'\')) LIKE LOWER(:search))'
             params['search'] = f'%{search_query}%'
 
-        # Add category filter if specified
         if category and category != 'all':
             query += ' AND p.category_id = :category'
             params['category'] = category
@@ -216,12 +215,13 @@ RETURNING id
     @staticmethod
     def get_all_categories():
         rows = app.db.execute('''
-            SELECT DISTINCT category_id
-            FROM Products
-            WHERE category_id IS NOT NULL
-            ORDER BY category_id
+            SELECT DISTINCT c.id, c.name
+            FROM Products p
+            JOIN Categories c ON p.category_id = c.id
+            WHERE p.category_id IS NOT NULL
+            ORDER BY c.name
         ''')
-        return [row[0] for row in rows]
+        return [(row[0], row[1]) for row in rows]  # Returns tuples of (id, name)
 
     @staticmethod
     def get_filtered_count(search_query, category=None):
@@ -238,3 +238,18 @@ RETURNING id
 
         count = app.db.execute(query, **params)
         return count[0][0]
+
+    @staticmethod
+    def get_sellers(product_id):
+        rows = app.db.execute('''
+            SELECT p.seller_id, p.price, p.quantity,
+                   COALESCE(AVG(pr.rscore)::NUMERIC(10,1), 0) as seller_rating,
+                   COUNT(DISTINCT pr.id) as review_count
+            FROM Products p
+            LEFT JOIN ProductReviews pr ON p.seller_id = pr.uid AND pr.for_seller = TRUE
+            WHERE p.id = :product_id
+            GROUP BY p.seller_id, p.price, p.quantity
+            HAVING p.quantity > 0
+            ORDER BY p.price ASC
+        ''', product_id=product_id)
+        return rows

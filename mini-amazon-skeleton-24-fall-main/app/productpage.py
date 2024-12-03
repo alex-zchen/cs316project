@@ -65,7 +65,13 @@ def product_detail(product_id):
     product = Product.get(product_id)
     if product is None:
         abort(404)
-        
+    
+    # Get all sellers for this product
+    sellers = Product.get_sellers(product_id)
+    
+    # Get all reviews for this product
+    reviews = AllReviews.get_product_reviews(product_id)
+    
     form = None
     purchased = False
     
@@ -105,9 +111,11 @@ def product_detail(product_id):
                         flash('Error submitting review: ' + str(e), 'error')
                 else:
                     flash('Review score must be between 1 and 5', 'error')
-                    
+    
     return render_template('product_detail.html',
                          product=product,
+                         sellers=sellers,
+                         reviews=reviews,
                          purchased=purchased,
                          form=form,
                          Category=Category)
@@ -116,7 +124,14 @@ def product_detail(product_id):
 @bp.route('/products/<int:product_id>/add_to_cart', methods=['POST'])
 @login_required
 def add_to_cart(product_id):
-    Cart.addCart(current_user.id, product_id, 1)
+    seller_id = request.args.get('seller_id', type=int)
+    quantity = request.form.get('quantity', type=int, default=1)
+    
+    if not seller_id or not quantity:
+        flash('Invalid request', 'error')
+        return redirect(url_for('products.product_detail', product_id=product_id))
+    
+    Cart.addCart(current_user.id, product_id, quantity, seller_id)
     flash('Product added to cart successfully!', 'success')
     return redirect(url_for('products.product_detail', product_id=product_id))
 

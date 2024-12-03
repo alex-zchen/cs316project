@@ -142,3 +142,15 @@ AND uid = :uid
                               pid=pid,
                               rscore=rscore,
                               time_reviewed=time_reviewed)
+
+    @staticmethod
+    def get_product_reviews(pid):
+        rows = app.db.execute('''
+            SELECT uid, pid, rscore, time_reviewed
+            FROM ProductReviews
+            WHERE pid = :pid
+            AND for_seller = FALSE
+            ORDER BY time_reviewed DESC
+        ''',
+        pid=pid)
+        return rows

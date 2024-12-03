@@ -96,51 +96,85 @@
 
                     <p class="text-gray-600">
                         <span class="font-semibold">Status:</span>
-                        {% if product.available %}
-                        <span class="text-green-600">In Stock</span>
+                        {% if product.available and product.quantity is not none and product.quantity > 0 %}
+                        <span class="text-green-600">{{ product.quantity }} in Stock</span>
                         {% else %}
                         <span class="text-red-600">Out of Stock</span>
                         {% endif %}
                     </p>
 
-                    <!-- Add to Cart Button -->
-                    {% if product.available %}
-                    {% if current_user.is_authenticated %}
-                    <form action="{{ url_for('products.add_to_cart', product_id=product.id) }}" method="POST"
-                        class="mt-4">
-                        <button type="submit"
-                            class="bg-black text-white px-6 py-2 rounded-md hover:bg-gray-800 transition-colors">
-                            Add to Cart
-                        </button>
-                    </form>
-                    {% if purchased %}
-                    <br>
-                    <p class="text-gray-600">
-                        <span class="font-semibold">Leave a Review: </span>
-                    </p>
-                    <form action="" method="post">
-                        {{ form.hidden_tag() }}
-                        <p>
-                            {{ form.rscore.label }}<br />
-                            {{ form.rscore(size=32) }}<br />
-                            {% for error in form.rscore.errors %}
-                            <span style="color: red;">[{{ error }}]</span>
+                    <!-- Sellers Section -->
+                    <div class="mt-6">
+                        <h2 class="text-xl font-semibold mb-4">Available Sellers</h2>
+                        <div class="space-y-4">
+                            {% for seller in sellers %}
+                            <div class="border rounded p-4">
+                                <div class="flex justify-between items-center">
+                                    <div>
+                                        <a href="{{ url_for('users.pubPage', user_id=seller.seller_id) }}" 
+                                           class="text-blue-600 hover:underline">
+                                            Seller ID: {{ seller.seller_id }}
+                                        </a>
+                                        <p class="text-gray-600">Price: ${{ "%.2f"|format(seller.price) }}</p>
+                                        <p class="text-gray-600">
+                                            {% if seller.quantity > 0 %}
+                                            <span class="text-green-600">{{ seller.quantity }} in Stock</span>
+                                            {% else %}
+                                            <span class="text-red-600">Out of Stock</span>
+                                            {% endif %}
+                                        </p>
+                                    </div>
+                                    {% if seller.quantity > 0 and current_user.is_authenticated %}
+                                    <form action="{{ url_for('products.add_to_cart', product_id=product.id, seller_id=seller.seller_id) }}" 
+                                          method="POST" 
+                                          class="flex items-center gap-2">
+                                        <input type="number" 
+                                               name="quantity" 
+                                               value="1" 
+                                               min="1" 
+                                               max="{{ seller.quantity }}" 
+                                               class="w-20 p-2 border rounded">
+                                        <button type="submit" 
+                                                class="bg-black text-white px-4 py-2 rounded hover:bg-gray-800">
+                                            Add to Cart
+                                        </button>
+                                    </form>
+                                    {% elif not current_user.is_authenticated %}
+                                    <a href="{{ url_for('users.login') }}" 
+                                       class="bg-black text-white px-4 py-2 rounded hover:bg-gray-800">
+                                        Login to Buy
+                                    </a>
+                                    {% endif %}
+                                </div>
+                            </div>
                             {% endfor %}
-                        </p>
-                        <p>{{ form.submit() }}</p>
-                    </form>
-                    {% endif %}
-                    {% else %}
-                    <a href="{{ url_for('users.login') }}"
-                        class="inline-block bg-black text-black px-6 py-2 rounded-md hover:bg-gray-800 transition-colors">
-                        Login to Add to Cart
-                    </a>
-                    {% endif %}
-                    {% else %}
-                    <button disabled class="bg-gray-400 text-white px-6 py-2 rounded-md cursor-not-allowed">
-                        Out of Stock
-                    </button>
-                    {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Reviews Section -->
+                    <div class="mt-8">
+                        <h2 class="text-xl font-semibold mb-4">Product Reviews</h2>
+                        {% if reviews %}
+                        <div class="space-y-4">
+                            {% for review in reviews %}
+                            <div class="border rounded p-4">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <div class="flex">
+                                        {% for i in range(5) %}
+                                        <span class="text-lg {% if i < review.rscore %}text-yellow-400{% else %}text-gray-300{% endif %}">★</span>
+                                        {% endfor %}
+                                    </div>
+                                    <span class="text-gray-600">by User {{ review.uid }}</span>
+                                    <span class="text-gray-400">{{ review.time_reviewed.strftime('%Y-%m-%d') }}</span>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <p class="text-gray-600">No reviews yet.</p>
+                        {% endif %}
+                    </div>
+
                 </div>
 
             </div>

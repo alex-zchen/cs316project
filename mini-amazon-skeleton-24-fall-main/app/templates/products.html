@@ -57,13 +57,13 @@
                        class="w-full p-2 border rounded">
             </div>
             <div class="flex gap-2">
-                <select name="category" class="p-2 border rounded">
-                    <option value="all" {% if category == 'all' %}selected{% endif %}>All Categories</option>
-                    {% for cat in categories %}
-                        <option value="{{ cat }}" {% if category == cat %}selected{% endif %}>
-                            {{ cat }}
-                        </option>
-                    {% endfor %}
+                    <select name="category" class="p-2 border rounded">
+                        <option value="all" {% if category == 'all' %}selected{% endif %}>All Categories</option>
+                        {% for cat_id, cat_name in categories %}
+                            <option value="{{ cat_id }}" {% if category|string == cat_id|string %}selected{% endif %}>
+                                {{ cat_name }}
+                            </option>
+                        {% endfor %}
                 </select>
                 <select name="sort_by" class="p-2 border rounded">
                     <option value="id" {% if sort_by == 'id' %}selected{% endif %}>Sort By</option>

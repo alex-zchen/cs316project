@@ -4,16 +4,17 @@ from datetime import datetime
 
 class Cart:
     
-    def __init__(self, id, uid, pid, quant):
+    def __init__(self, id, uid, pid, quant, seller_id):
         self.id = id
         self.uid = uid
         self.pid = pid
         self.quant = quant
+        self.seller_id = seller_id
 
     @staticmethod
     def get(uid):
         rows = app.db.execute('''
-        SELECT *
+        SELECT id, uid, pid, quant, seller_id
         FROM Carts
         WHERE uid = :uid
         ''',
@@ -44,31 +45,31 @@ class Cart:
             return rows[0][0]
     
     @staticmethod
-    def addCart(uid, pid, quant):
+    def addCart(uid, pid, quant, seller_id):
         try:
-            # Check if item already exists in cart
+            # Check if item already exists in cart from this seller
             existing_item = app.db.execute("""
                 SELECT id, quant
                 FROM Carts
-                WHERE uid = :uid AND pid = :pid
+                WHERE uid = :uid AND pid = :pid AND seller_id = :seller_id
             """,
-            uid=uid, pid=pid)
+            uid=uid, pid=pid, seller_id=seller_id)
             
             if existing_item:
                 # Update quantity if item exists
                 app.db.execute("""
                 UPDATE Carts
                 SET quant = quant + :quant
-                WHERE uid = :uid AND pid = :pid
+                WHERE uid = :uid AND pid = :pid AND seller_id = :seller_id
                 """,
-                uid=uid, pid=pid, quant=quant)
+                uid=uid, pid=pid, quant=quant, seller_id=seller_id)
             else:
                 # Insert new item if it doesn't exist
                 app.db.execute("""
-                INSERT INTO Carts(uid, pid, quant)
-                VALUES(:uid, :pid, :quant)
+                INSERT INTO Carts(uid, pid, quant, seller_id)
+                VALUES(:uid, :pid, :quant, :seller_id)
                 """,
-                uid=uid, pid=pid, quant=quant)
+                uid=uid, pid=pid, quant=quant, seller_id=seller_id)
             
             return Cart.get(uid)
         except Exception as e:
