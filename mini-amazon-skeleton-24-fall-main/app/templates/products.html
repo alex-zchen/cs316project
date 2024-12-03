@@ -46,6 +46,16 @@
         }
     </style>
 
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-info" role="alert">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+    {% endwith %}
+
     <!-- Search and Filter Form -->
     <form method="GET" action="{{ url_for('products.product_list') }}" class="mb-8">
         <div class="flex flex-wrap gap-4">

@@ -162,6 +162,14 @@ class Cart:
             if total_price == 0:
                 return None
             
+            # Get active coupon if any
+            active_coupon = app.db.execute('''
+                SELECT active_coupon
+                FROM Users
+                WHERE id = :uid
+            ''', uid=uid)
+            coupon_code = active_coupon[0][0] if active_coupon and active_coupon[0][0] else None
+            
             discount_info = Cart.get_active_discount(uid)
             if discount_info:
                 total_price = total_price * (1 - discount_info['percent'] / 100)
@@ -179,19 +187,19 @@ class Cart:
             """, uid=uid)
 
             if insufficient_quantity:
-                # There are items with insufficient quantity
                 return None
 
             # If balance is sufficient and quantities are available, proceed with purchase
             rows = app.db.execute("""
-                INSERT INTO Purchases (uid, pid, time_purchased, quantity)
-                SELECT uid, pid, :time_purchased, quant
+                INSERT INTO Purchases (uid, pid, time_purchased, quantity, coupon_code)
+                SELECT uid, pid, :time_purchased, quant, :coupon_code
                 FROM Carts
                 WHERE uid = :uid
                 RETURNING id
             """, 
             uid=uid,
-            time_purchased=current_time)
+            time_purchased=current_time,
+            coupon_code=coupon_code)
 
             # Update user balance and clear cart only if purchase was successful
             if rows:
@@ -222,13 +230,6 @@ class Cart:
                     WHERE uid = :uid
                 """, 
                 uid=uid)
-
-                # Clear the active coupon after purchase
-                app.db.execute('''
-                    UPDATE Users
-                    SET active_coupon = NULL
-                    WHERE id = :uid
-                ''', uid=uid)
 
                 # Return the IDs of the purchases made
                 return [row[0] for row in rows]

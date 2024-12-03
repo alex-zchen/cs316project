@@ -41,7 +41,8 @@ CREATE TABLE Purchases (
     pid INT NOT NULL REFERENCES Products(id),
     time_purchased timestamp without time zone NOT NULL DEFAULT (current_timestamp AT TIME ZONE 'UTC'),
     fulfilled BOOLEAN DEFAULT FALSE,
-    quantity INT NOT NULL DEFAULT 1
+    quantity INT NOT NULL DEFAULT 1,
+    coupon_code VARCHAR(20) REFERENCES Coupons(code)
 );
 
 CREATE TABLE ProductReviews (

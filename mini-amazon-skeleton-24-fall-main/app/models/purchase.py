@@ -4,18 +4,19 @@ from datetime import datetime
 now = str(datetime.now())
 
 class Purchase:
-    def __init__(self, id, uid, pid, time_purchased, fulfilled, quantity):
+    def __init__(self, id, uid, pid, time_purchased, fulfilled, quantity, coupon_code=None):
         self.id = id
         self.uid = uid
         self.pid = pid
         self.time_purchased = time_purchased
         self.fulfilled = fulfilled
         self.quantity = quantity
+        self.coupon_code = coupon_code
 
     @staticmethod
     def get(id):
         rows = app.db.execute('''
-SELECT id, uid, pid, time_purchased, fulfilled, quantity
+SELECT id, uid, pid, time_purchased, fulfilled, quantity, coupon_code
 FROM Purchases
 WHERE id = :id
 ''',
@@ -26,7 +27,7 @@ WHERE id = :id
     def get_all_by_uid_since(uid, since = -1):
         if(since != -1):
             rows = app.db.execute('''
-            SELECT id, uid, pid, time_purchased, fulfilled, quantity
+            SELECT id, uid, pid, time_purchased, fulfilled, quantity, coupon_code
             FROM Purchases
             WHERE uid = :uid
             AND time_purchased >= :since
@@ -36,7 +37,7 @@ WHERE id = :id
             since=since)
         else:
             rows = app.db.execute('''
-            SELECT id, uid, pid, time_purchased, fulfilled, quantity
+            SELECT id, uid, pid, time_purchased, fulfilled, quantity, coupon_code
             FROM Purchases
             WHERE uid = :uid
             ORDER BY time_purchased DESC
@@ -47,7 +48,7 @@ WHERE id = :id
     @staticmethod
     def if_purchased(uid, sid):
         rows = app.db.execute('''
-            SELECT Purchases.id, uid, pid, time_purchased, fulfilled, quantity
+            SELECT Purchases.id, uid, pid, time_purchased, fulfilled, quantity, coupon_code
             FROM Purchases, Products
             WHERE Purchases.uid = :uid
             AND Purchases.pid = Products.id
@@ -61,7 +62,7 @@ WHERE id = :id
     @staticmethod
     def if_purchased_item(uid, pid):
         rows = app.db.execute('''
-            SELECT id, uid, pid, time_purchased, fulfilled, quantity
+            SELECT id, uid, pid, time_purchased, fulfilled, quantity, coupon_code
             FROM Purchases
             WHERE uid = :uid
             AND pid = :pid
@@ -72,17 +73,18 @@ WHERE id = :id
         return [Purchase(*(rows[0]))]  if rows else None
       
     @staticmethod
-    def add_purchase(uid, pid):
+    def add_purchase(uid, pid, coupon_code=None):
         current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         try:
             rows = app.db.execute("""
-INSERT INTO Purchases(uid, pid, time_purchased, fulfilled, quantity)
-VALUES(:uid, :pid, :time_purchased, FALSE, 1)
+INSERT INTO Purchases(uid, pid, time_purchased, fulfilled, quantity, coupon_code)
+VALUES(:uid, :pid, :time_purchased, FALSE, 1, :coupon_code)
 RETURNING id
 """,
                                   uid=uid,
                                   pid=pid, 
-                                  time_purchased=current_time)
+                                  time_purchased=current_time,
+                                  coupon_code=coupon_code)
             id = rows[0][0]
             return Purchase.get(id)
         except Exception as e:
@@ -102,7 +104,7 @@ RETURNING id
     @staticmethod
     def get_orders_by_time(uid, timestamp):
         rows = app.db.execute('''
-        SELECT id, uid, pid, time_purchased, fulfilled, quantity
+        SELECT id, uid, pid, time_purchased, fulfilled, quantity, coupon_code
         FROM Purchases
         WHERE uid = :uid
         AND time_purchased = :timestamp
