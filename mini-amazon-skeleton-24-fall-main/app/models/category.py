@@ -23,4 +23,9 @@ FROM Categories
 WHERE id = :id
 ''',
                             id=id)
-        return Category(*(rows[0])) if rows else None 
+        return Category(*(rows[0])) if rows else None
+
+    @staticmethod
+    def get_name(id):
+        category = Category.get(id)
+        return category.name if category else "Uncategorized"

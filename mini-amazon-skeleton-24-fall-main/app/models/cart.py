@@ -121,7 +121,20 @@ class Cart:
             if current_user.balance < total_price:
                 return None
 
-            # If balance is sufficient, proceed with purchase
+            # Check if all products have sufficient quantity
+            insufficient_quantity = app.db.execute("""
+                SELECT *
+                FROM Carts c, Products p
+                WHERE c.uid = :uid 
+                AND c.pid = p.id 
+                AND p.quantity < c.quant
+            """, uid=uid)
+
+            if insufficient_quantity:
+                # There are items with insufficient quantity
+                return None
+
+            # If balance is sufficient and quantities are available, proceed with purchase
             rows = app.db.execute("""
                 INSERT INTO Purchases (uid, pid, time_purchased)
                 SELECT uid, pid, :time_purchased
@@ -145,6 +158,15 @@ class Cart:
                     password=current_user.password,
                     address=current_user.address
                 )
+
+                # Update product quantities
+                app.db.execute("""
+                    UPDATE Products p
+                    SET quantity = p.quantity - c.quant
+                    FROM Carts c
+                    WHERE p.id = c.pid AND c.uid = :uid
+                """,
+                uid=uid)
 
                 # Remove items from cart
                 app.db.execute("""
