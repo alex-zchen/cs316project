@@ -9,6 +9,8 @@ from .. import login
 ##SKELETON: Used User skeleton from mini amazon project to build user class. Specifically used init, get, get_by_auth and email exists. Used register as inspiration using new 
 #account setup with balance and address
 class User(UserMixin):
+    #Generic init, just has all the properties a user needs to have. inspired by mini amazon skeleton, but added relevant fields (address and balance, etc.) to build 
+    #a more complete user object. 
     def __init__(self, id, email, firstname, lastname, password, address, balance = 0):
         self.id = id
         self.email = email
@@ -18,6 +20,7 @@ class User(UserMixin):
         self.password = password
         self.balance = balance
 
+    #Get user by email and password, return user object if successful, return None if not. 
     @staticmethod
     def get_by_auth(email, password):
         rows = app.db.execute("""
@@ -34,6 +37,7 @@ class User(UserMixin):
         else:
             return User(*(rows[0][1:]))
 
+    #Check if email already exists in db, return true if it does, false otherwise. Inspired by mini amazon skeleton.
     @staticmethod
     def email_exists(email):
         rows = app.db.execute("""
@@ -44,7 +48,8 @@ class User(UserMixin):
                               email=email)
         return len(rows) > 0
 
-
+    #Register new user with form data, return user object if successful, return None if not. Inspired by mini amazon skeleton, but updated
+    #for our needs.
     @staticmethod
     def register(email, password, firstname, lastname, address, balance):
         try:
@@ -64,6 +69,8 @@ class User(UserMixin):
             # the following simply prints the error to the console:
             print(str(e))
             return None
+    #Update user info to update db and log them back in. Ensures that both current user and the db object are updated properly and reutrns
+    #true if successful, false otherwise.
     @staticmethod
     def update_info(id, email, password, firstname, lastname, address, balance):
         try:
@@ -79,6 +86,7 @@ class User(UserMixin):
             print(str(e))
             return False
 
+    #Get user by id, return user object if successful, return None if not.
     @staticmethod
     @login.user_loader
     def get(id):

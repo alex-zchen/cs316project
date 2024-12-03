@@ -4,7 +4,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!--Title for public profile page-->
     <title>{{ user.firstname }} {{user.lastname}}'s Profile (Seller {{user.id}})</title>
+    <!-- Stylings for user info tables, same as profile.html-->
     <style>
         .profile-table {
             width: 50%;
@@ -49,7 +51,9 @@
     </style>
 </head>
 <body>
+    <!--Display public page header-->
     <h1 style="margin-top: 5%; margin-left: 5%;">{{ user.firstname }} {{user.lastname}}'s Profile (Seller {{user.id}})</h1>
+    <!--Table for user info, same as profile.html-->
     <div class="table-container">
         <table class="table profile-table">
             <thead class="thead-dark">
