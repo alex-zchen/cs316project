@@ -56,6 +56,19 @@ WHERE id = :id
             uid=uid,
             sid=sid)
         return [Purchase(*(rows[0]))]  if rows else None
+
+    @staticmethod
+    def if_purchased_item(uid, pid):
+        rows = app.db.execute('''
+            SELECT id, uid, pid, time_purchased, fulfilled
+            FROM Purchases
+            WHERE uid = :uid
+            AND pid = :pid
+            ORDER BY time_purchased DESC
+            ''',
+            uid=uid,
+            pid=pid)
+        return [Purchase(*(rows[0]))]  if rows else None
       
     @staticmethod
     def add_purchase(uid, pid):
