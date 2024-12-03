@@ -110,40 +110,39 @@ def updateInfo():
 def profileDisplay():
     user = current_user
     purchases = Purchase.get_all_by_uid_since(uid = user.id, since = -1)
-    print(user.id)
-    productPurchases = []
-    #Loading purchases, building purchase objects TO-DO: add order link. 
-    for i, purchase in enumerate(purchases):
-        product = Product.get(purchase.pid)
-        purchaseObj = {}
-        purchaseObj['PurchaseDate'] = purchase.time_purchased
-        purchaseObj["ProductName"] = product.name
-        purchaseObj['Amount Paid'] = product.price
-        purchaseObj['Fulfillment Status'] = "Not yet shipped" if not purchase.fulfilled else "Shipped"
-        productPurchases.append(purchaseObj)
-    page_size = 5 
-    productPurchasePages = []
-
-    for i in range(0, len(productPurchases), page_size):
-        page = productPurchases[i:i + page_size]
-        productPurchasePages.append(page)
     
-    print(productPurchasePages)
-    if(len(productPurchasePages) == 0):
-        productPurchasePages = [[]]
+    # Group purchases by timestamp
+    orders = {}
+    for purchase in purchases:
+        product = Product.get(purchase.pid)
+        timestamp = purchase.time_purchased
+        
+        if timestamp not in orders:
+            orders[timestamp] = {
+                'total': 0,
+                'count': 0,
+                'timestamp': timestamp,
+                'uid': user.id
+            }
+        
+        orders[timestamp]['total'] += float(product.price)
+        orders[timestamp]['count'] += 1
+    
+    # Convert to list and sort by timestamp
+    order_list = list(orders.values())
+    order_list.sort(key=lambda x: x['timestamp'], reverse=True)
+    
+    # Paginate orders
+    page_size = 5 
+    order_pages = []
+    for i in range(0, len(order_list), page_size):
+        page = order_list[i:i + page_size]
+        order_pages.append(page)
+    
+    if len(order_pages) == 0:
+        order_pages = [[]]
 
-
-    running_total = 0
-    purchase_data = []
-    #Get total purchase cost over time:
-    for purchase in productPurchases:
-        running_total += float(purchase['Amount Paid'])
-        purchase_data.append({
-            'date': purchase['PurchaseDate'].strftime('%Y-%m-%d'),
-            'total': running_total
-        })
-    #Render profile with up to date user info and purchase history
-    return render_template('profile.html', user=user, purchases=productPurchasePages)
+    return render_template('profile.html', user=user, orders=order_pages)
 
 #Log the user in by validating their email using password hashing (inspired by mini amazon skeleton).
 @bp.route('/login', methods=['GET', 'POST'])
@@ -220,3 +219,22 @@ def update_balance_on_purchase():
         return True
     else:
         return False
+
+@bp.route("/order/<uid>/<timestamp>", methods=["GET"]) 
+def order_page(uid, timestamp):
+    purchases = Purchase.get_orders_by_time(uid=uid, timestamp=timestamp)
+    productPurchases = []
+    
+    for purchase in purchases:
+        product = Product.get(purchase.pid)
+        purchaseObj = {}
+        purchaseObj['PurchaseDate'] = purchase.time_purchased
+        purchaseObj["ProductName"] = product.name
+        purchaseObj['Amount_Paid'] = "{:.2f}".format(float(product.price))
+        purchaseObj['Fulfillment_Status'] = "Not yet shipped" if not purchase.fulfilled else "Shipped"
+        productPurchases.append(purchaseObj)
+
+    return render_template('order.html', 
+                         purchases=productPurchases, 
+                         timestamp=timestamp, 
+                         uid=uid)
