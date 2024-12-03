@@ -61,7 +61,7 @@ WHERE id = :id
     @staticmethod
     def if_purchased_item(uid, pid):
         rows = app.db.execute('''
-            SELECT id, uid, pid, time_purchased, fulfilled
+            SELECT id, uid, pid, time_purchased, fulfilled, quantity
             FROM Purchases
             WHERE uid = :uid
             AND pid = :pid

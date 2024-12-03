@@ -60,35 +60,58 @@ def product_list():
                          categories=categories)
 
 
-@bp.route('/products/<int:product_id>', methods=['GET', 'POST'])  # Changed from /product to /products
+@bp.route('/products/<int:product_id>', methods=['GET', 'POST'])
 def product_detail(product_id):
     product = Product.get(product_id)
     if product is None:
         abort(404)
+        
+    form = None
+    purchased = False
+    
     if current_user.is_authenticated:
-        if (len(AllReviews.check_by_uid_for_pid(current_user.id, product_id)) ==0):
-            form = ProductReviewForm()
-        else:
-            form = ChangeReviewForm()
-        if form.validate_on_submit():
-            if (form.rscore.data>=0 and form.rscore.data<=5):
-                if (len(AllReviews.check_by_uid_for_pid(current_user.id, product_id)) ==0):
-                    AllReviews.reviewProduct(current_user.id, 
-                                    product_id, form.rscore.data, 
-                                    datetime.now())
-                    return render_template('product_detail.html', product=product, purchased=True, form=form,
-                         Category=Category)
+        purchase_check = Purchase.if_purchased_item(current_user.id, product_id)
+        purchased = purchase_check is not None
+        
+        if purchased:
+            existing_review = AllReviews.check_by_uid_for_pid(current_user.id, product_id)
+            if existing_review:
+                form = ChangeReviewForm()
+            else:
+                form = ProductReviewForm()
+                
+            if form.validate_on_submit():
+                rscore = form.rscore.data
+                if 1 <= rscore <= 5:
+                    try:
+                        if existing_review:
+                            AllReviews.update_rscore(
+                                current_user.id,
+                                product_id,
+                                rscore,
+                                datetime.now()
+                            )
+                            flash('Review updated successfully!', 'success')
+                        else:
+                            AllReviews.reviewProduct(
+                                current_user.id,
+                                product_id,
+                                rscore,
+                                datetime.now()
+                            )
+                            flash('Review added successfully!', 'success')
+                        return redirect(url_for('products.product_detail', product_id=product_id))
+                    except Exception as e:
+                        flash('Error submitting review: ' + str(e), 'error')
                 else:
-                    AllReviews.update_rscore(current_user.id, 
-                                    product_id, form.rscore.data, 
-                                    datetime.now())
-                    return render_template('product_detail.html', product=product, purchased=True, form=form,
+                    flash('Review score must be between 1 and 5', 'error')
+                    
+    return render_template('product_detail.html',
+                         product=product,
+                         purchased=purchased,
+                         form=form,
                          Category=Category)
-        if Purchase.if_purchased_item(current_user.id, product_id):
-            return render_template('product_detail.html', product=product, purchased=True, form=form,
-                         Category=Category)
-    return render_template('product_detail.html', product=product, form=form,
-                         Category=Category)
+
 
 @bp.route('/products/<int:product_id>/add_to_cart', methods=['POST'])
 @login_required

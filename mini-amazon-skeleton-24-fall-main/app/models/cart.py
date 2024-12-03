@@ -136,8 +136,8 @@ class Cart:
 
             # If balance is sufficient and quantities are available, proceed with purchase
             rows = app.db.execute("""
-                INSERT INTO Purchases (uid, pid, time_purchased)
-                SELECT uid, pid, :time_purchased
+                INSERT INTO Purchases (uid, pid, time_purchased, quantity)
+                SELECT uid, pid, :time_purchased, quant
                 FROM Carts
                 WHERE uid = :uid
                 RETURNING id
