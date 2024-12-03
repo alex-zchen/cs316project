@@ -74,7 +74,7 @@ def seller():
     return render_template('seller.html',
                          products_in_inventory=product_pages,
                          form=form,
-                         view_type=view_type) 
+                         view_type=view_type, user = current_user) 
 
 @bp.route('/update_quantity/<int:product_id>', methods=['POST'])
 def update_quantity(product_id):

@@ -154,6 +154,13 @@ def login():
     return render_template('login.html', title='Sign In', form=form)
 
 
+
+@bp.route('/public_profile/<int:user_id>', methods=['GET'])
+def pubPage(user_id):
+    #Get user by ID
+    user = User.get(user_id)
+    return render_template('publicpage.html', user=user)
+
 class RegistrationForm(FlaskForm):
     firstname = StringField('First Name', validators=[DataRequired()])
     lastname = StringField('Last Name', validators=[DataRequired()])

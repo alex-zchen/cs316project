@@ -4,7 +4,7 @@
 
 <style>
   .form-container {
-      margin-top: 20px; /* Adjust the value as needed */
+      margin-top: 20px;
   }
 </style>
 
@@ -28,6 +28,7 @@
   <p>
     {{ form.password.label }}<br/>
     {{ form.password(size=32) }}<br/>
+    <span style="color: green;">Your password will be securely encrypted</span>
     {% for error in form.password.errors %}
     <span style="color: red;">[{{ error }}]</span>
     {% endfor %}

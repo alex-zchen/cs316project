@@ -1,6 +1,5 @@
 {% extends "base.html" %}
 {% block content %}
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -50,6 +49,9 @@
 </head>
 <body>
     <h1 style="margin-top: 5%; margin-left: 5%;">Hello {{ user.firstname }}!</h1>
+    <p style="margin-left: 5%;"> You're on your profile page.
+        <a href="{{ url_for('users.pubPage', user_id=user.id) }}">Want to see your public page?</a>
+    </p>
     <div class="table-container">
         <table class="table profile-table">
             <thead class="thead-dark">
@@ -130,5 +132,4 @@
     </div>
 </body>
 </html>
-
 {% endblock %}
