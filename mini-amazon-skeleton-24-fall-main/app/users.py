@@ -109,7 +109,7 @@ def updateInfo():
 #Displays the profile page, showing their info (editable) and their previous purchases in reverse chronological order.
 def profileDisplay():
     user = current_user
-    purchases = Purchase.get_all_by_uid_since(uid = user.id, since = -1)
+    purchases = Purchase.get_all_by_uid_since(uid=user.id, since=-1)
     
     # Group purchases by timestamp
     orders = {}
@@ -125,8 +125,8 @@ def profileDisplay():
                 'uid': user.id
             }
         
-        orders[timestamp]['total'] += float(product.price)
-        orders[timestamp]['count'] += 1
+        orders[timestamp]['total'] += float(product.price) * purchase.quantity
+        orders[timestamp]['count'] += purchase.quantity
     
     # Convert to list and sort by timestamp
     order_list = list(orders.values())

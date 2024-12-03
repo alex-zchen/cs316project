@@ -4,17 +4,18 @@ from datetime import datetime
 now = str(datetime.now())
 
 class Purchase:
-    def __init__(self, id, uid, pid, time_purchased, fulfilled):
+    def __init__(self, id, uid, pid, time_purchased, fulfilled, quantity):
         self.id = id
         self.uid = uid
         self.pid = pid
         self.time_purchased = time_purchased
         self.fulfilled = fulfilled
+        self.quantity = quantity
 
     @staticmethod
     def get(id):
         rows = app.db.execute('''
-SELECT id, uid, pid, time_purchased, fulfilled
+SELECT id, uid, pid, time_purchased, fulfilled, quantity
 FROM Purchases
 WHERE id = :id
 ''',
@@ -25,7 +26,7 @@ WHERE id = :id
     def get_all_by_uid_since(uid, since = -1):
         if(since != -1):
             rows = app.db.execute('''
-            SELECT id, uid, pid, time_purchased, fulfilled
+            SELECT id, uid, pid, time_purchased, fulfilled, quantity
             FROM Purchases
             WHERE uid = :uid
             AND time_purchased >= :since
@@ -35,7 +36,7 @@ WHERE id = :id
             since=since)
         else:
             rows = app.db.execute('''
-            SELECT id, uid, pid, time_purchased, fulfilled
+            SELECT id, uid, pid, time_purchased, fulfilled, quantity
             FROM Purchases
             WHERE uid = :uid
             ORDER BY time_purchased DESC
@@ -46,7 +47,7 @@ WHERE id = :id
     @staticmethod
     def if_purchased(uid, sid):
         rows = app.db.execute('''
-            SELECT Purchases.id, uid, pid, time_purchased, fulfilled
+            SELECT Purchases.id, uid, pid, time_purchased, fulfilled, quantity
             FROM Purchases, Products
             WHERE Purchases.uid = :uid
             AND Purchases.pid = Products.id
@@ -55,15 +56,15 @@ WHERE id = :id
             ''',
             uid=uid,
             sid=sid)
-        return [Purchase(*(rows[0]))]  if rows else None
+        return [Purchase(*(rows[0]))] if rows else None
       
     @staticmethod
     def add_purchase(uid, pid):
         current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         try:
             rows = app.db.execute("""
-INSERT INTO Purchases(uid, pid, time_purchased, fulfilled)
-VALUES(:uid, :pid, :time_purchased, FALSE)
+INSERT INTO Purchases(uid, pid, time_purchased, fulfilled, quantity)
+VALUES(:uid, :pid, :time_purchased, FALSE, 1)
 RETURNING id
 """,
                                   uid=uid,
@@ -88,7 +89,7 @@ RETURNING id
     @staticmethod
     def get_orders_by_time(uid, timestamp):
         rows = app.db.execute('''
-        SELECT id, uid, pid, time_purchased, fulfilled
+        SELECT id, uid, pid, time_purchased, fulfilled, quantity
         FROM Purchases
         WHERE uid = :uid
         AND time_purchased = :timestamp
