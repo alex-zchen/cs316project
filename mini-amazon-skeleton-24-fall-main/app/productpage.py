@@ -1,11 +1,25 @@
 from flask import Blueprint, render_template, request, abort, redirect, url_for, flash
 from flask import current_app as app
+from flask_wtf import FlaskForm
 from flask_login import current_user, login_required
 import math
 from .models.product import Product
+from .models.purchase import Purchase
 from .models.cart import Cart
+from .models.productreview import AllReviews
+from wtforms import StringField, IntegerField, BooleanField, SubmitField
+from wtforms.validators import ValidationError, DataRequired, Email, EqualTo
+from datetime import datetime
 
 bp = Blueprint('products', __name__)
+
+class ProductReviewForm(FlaskForm):
+    rscore = IntegerField('Review Score (1-5)', validators=[DataRequired()])
+    submit = SubmitField('List Review')
+
+class ChangeReviewForm(FlaskForm):
+    rscore = IntegerField('Change Score (1-5)', validators=[DataRequired()])
+    submit = SubmitField('List Review')
 
 @bp.route('/', methods=['GET', 'POST'])
 def product_list():
@@ -44,14 +58,33 @@ def product_list():
                          category=category,
                          categories=categories)
 
-@bp.route('/products/<int:product_id>')  # Changed from /product to /products
+@bp.route('/products/<int:product_id>', methods=['GET', 'POST'])  # Changed from /product to /products
 def product_detail(product_id):
     product = Product.get(product_id)
     if product is None:
         abort(404)
+    if current_user.is_authenticated:
+        if (len(AllReviews.check_by_uid_for_pid(current_user.id, product_id)) ==0):
+            form = ProductReviewForm()
+        else:
+            form = ChangeReviewForm()
+        if form.validate_on_submit():
+            if (form.rscore.data>=0 and form.rscore.data<=5):
+                if (len(AllReviews.check_by_uid_for_pid(current_user.id, product_id)) ==0):
+                    AllReviews.reviewProduct(current_user.id, 
+                                    product_id, form.rscore.data, 
+                                    datetime.now())
+                    return render_template('product_detail.html', product=product, purchased=True, form=form)
+                else:
+                    AllReviews.update_rscore(current_user.id, 
+                                    product_id, form.rscore.data, 
+                                    datetime.now())
+                    return render_template('product_detail.html', product=product, purchased=True, form=form)
+        if Purchase.if_purchased_item(current_user.id, product_id):
+            return render_template('product_detail.html', product=product, purchased=True, form=form)
 
         
-    return render_template('product_detail.html', product=product)
+    return render_template('product_detail.html', product=product, form=form)
 
 @bp.route('/products/<int:product_id>/add_to_cart', methods=['POST'])
 @login_required ##fix this so u cannot add to cart if not logged in
