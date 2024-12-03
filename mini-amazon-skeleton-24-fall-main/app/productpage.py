@@ -4,6 +4,7 @@ from flask_login import current_user, login_required
 import math
 from .models.product import Product
 from .models.cart import Cart
+from .models.category import Category
 
 bp = Blueprint('products', __name__)
 
@@ -44,17 +45,18 @@ def product_list():
                          category=category,
                          categories=categories)
 
-@bp.route('/products/<int:product_id>')  # Changed from /product to /products
+@bp.route('/products/<int:product_id>')
 def product_detail(product_id):
     product = Product.get(product_id)
     if product is None:
         abort(404)
-
         
-    return render_template('product_detail.html', product=product)
+    return render_template('product_detail.html', 
+                         product=product,
+                         Category=Category)
 
 @bp.route('/products/<int:product_id>/add_to_cart', methods=['POST'])
-@login_required ##fix this so u cannot add to cart if not logged in
+@login_required
 def add_to_cart(product_id):
     Cart.addCart(current_user.id, product_id, 1)
     flash('Product added to cart successfully!', 'success')

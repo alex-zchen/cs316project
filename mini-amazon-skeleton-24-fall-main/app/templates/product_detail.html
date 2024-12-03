@@ -80,7 +80,7 @@
                 <div class="mt-6 space-y-2">
                     <p class="text-gray-600">
                         <span class="font-semibold">Category:</span>
-                        {{ product.category_id if product.category_id else "Uncategorized" }}
+                        {{ Category.get_name(product.category_id) if product.category_id else "Uncategorized" }}
                     </p>
                     <p class="text-gray-600">
                         <span class="font-semibold">Seller ID:</span>
