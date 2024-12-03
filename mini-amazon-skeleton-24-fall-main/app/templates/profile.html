@@ -88,40 +88,44 @@
             </tbody>
         </table>
         <div class="col">
-                <h2 style="font-size: 1.5rem; font-family: 'Playfair Display';">Your Purchases</h2>
-        <table class="table profile-table">
-            <thead>
-                {% if purchases[0] %}
-                <tr>
-                    <th>Product Name</th>
-                    <th>Purchase Date</th>
-                    <th>Amount Paid</th>
-                    <th>Fulfillment Status</th>
-                </tr>
-                {% endif %}
-            </thead>
-            <tbody>
-                {% for purchase in purchases[request.args.get('page', 0)|int] %}
-                <tr>
-                    <td>{{ purchase.ProductName }}</td>
-                    <td>{{ purchase.PurchaseDate }}</td>
-                    <td>${{ purchase["Amount Paid"] }}</td>
-                    <td>{{ purchase["Fulfillment Status"] }}</td>
-                </tr>
-                {% else %}
-                <tr>
-                    <td>No purchases found.</td>
-                </tr>
+            <h2 style="font-size: 1.5rem; font-family: 'Playfair Display';">Your Orders</h2>
+            <table class="table profile-table">
+                <thead>
+                    {% if orders[0] %}
+                    <tr>
+                        <th>Order Date</th>
+                        <th>Items</th>
+                        <th>Total</th>
+                        <th>Actions</th>
+                    </tr>
+                    {% endif %}
+                </thead>
+                <tbody>
+                    {% for order in orders[request.args.get('page', 0)|int] %}
+                    <tr>
+                        <td>{{ order.timestamp }}</td>
+                        <td>{{ order.count }} items</td>
+                        <td>${{ "%.2f"|format(order.total) }}</td>
+                        <td>
+                            <a href="{{ url_for('users.order_page', uid=order.uid, timestamp=order.timestamp) }}" 
+                               class="btn btn-primary btn-sm">View Details</a>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="4">No orders found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <div class="pagination">
+                {% for i in range(orders|length) %}
+                <a href="{{ url_for('users.profileDisplay', page=i) }}" 
+                   class="page-button {% if i == request.args.get('page', 0)|int %}active-page{% endif %}">
+                    {{ i + 1 }}
+                </a>
                 {% endfor %}
-            </tbody>
-        </table>
-        <div class="pagination">
-            {% for i in range(purchases|length) %}
-            <a href="{{ url_for('users.profileDisplay', page=i) }}" 
-               class="page-button {% if i == request.args.get('page', 0)|int %}active-page{% endif %}">
-                {{ i + 1 }}
-            </a>
-            {% endfor %}
+            </div>
         </div>
     </div>
 </body>

@@ -37,3 +37,8 @@ SELECT pg_catalog.setval('public.wishes_id_seq',
 SELECT pg_catalog.setval('public.users_id_seq',
                          (SELECT MAX(id)+1 FROM Carts),
                          false);
+
+\COPY Orders FROM 'Orders.csv' WITH DELIMITER ',' NULL '' CSV
+SELECT pg_catalog.setval('public.orders_id_seq',
+                         (SELECT MAX(id)+1 FROM Orders),
+                         false);

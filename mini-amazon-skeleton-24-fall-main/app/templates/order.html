@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Order Details</h2>
+<p>Order Time: {{ timestamp }}</p>
+<p>User ID: {{ uid }}</p>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Purchase Date</th>
+            <th>Product Name</th>
+            <th>Amount Paid</th>
+            <th>Fulfillment Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for purchase in purchases %}
+        <tr>
+            <td>{{ purchase.PurchaseDate }}</td>
+            <td>{{ purchase.ProductName }}</td>
+            <td>${{ purchase.Amount_Paid }}</td>
+            <td>{{ purchase.Fulfillment_Status }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% if not purchases %}
+<p>No purchases found for this order.</p>
+{% endif %}
+
+{% endblock %} 
