@@ -12,6 +12,7 @@ import base64
 import io
 import matplotlib
 import matplotlib.pyplot as plt
+from flask import current_app as app
 
 from flask import Blueprint
 bp = Blueprint('users', __name__)
@@ -157,10 +158,19 @@ def profileDisplay():
                 'uid': user.id
             }
         
-        orders[timestamp]['total'] += float(product.price) * purchase.quantity
+        # Calculate price after coupon discount if applicable
+        price = float(product.price)
+        if purchase.coupon_code:
+            discount = app.db.execute('''
+                SELECT discount_percent
+                FROM Coupons
+                WHERE code = :code
+            ''', code=purchase.coupon_code)[0][0]
+            price = price * (1 - float(discount)/100)
+        
+        orders[timestamp]['total'] += price * purchase.quantity
         orders[timestamp]['count'] += purchase.quantity
-        cumulative_total += float(product.price) * purchase.quantity
-        print(cumulative_total)
+        cumulative_total += price * purchase.quantity
         orders[timestamp]['cumulative_total'] = cumulative_total
     
     # Convert to list and sort by timestamp
@@ -279,11 +289,22 @@ def order_page(uid, timestamp):
     
     for purchase in purchases:
         product = Product.get(purchase.pid)
+        price = float(product.price)
+        
+        # Apply coupon discount if applicable
+        if purchase.coupon_code:
+            discount = app.db.execute('''
+                SELECT discount_percent
+                FROM Coupons
+                WHERE code = :code
+            ''', code=purchase.coupon_code)[0][0]
+            price = price * (1 - float(discount)/100)
+        
         purchaseObj = {}
         purchaseObj['PurchaseDate'] = purchase.time_purchased
         purchaseObj["ProductName"] = product.name
         purchaseObj['Quantity'] = purchase.quantity
-        purchaseObj['Amount_Paid'] = "{:.2f}".format(float(product.price) * purchase.quantity)
+        purchaseObj['Amount_Paid'] = "{:.2f}".format(price * purchase.quantity)
         purchaseObj['Fulfillment_Status'] = "Not yet shipped" if not purchase.fulfilled else "Shipped"
         productPurchases.append(purchaseObj)
 
