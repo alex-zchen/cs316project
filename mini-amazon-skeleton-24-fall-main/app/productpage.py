@@ -20,7 +20,7 @@ class ProductReviewForm(FlaskForm):
 
 class ChangeReviewForm(FlaskForm):
     rscore = IntegerField('Change Score (1-5)', validators=[DataRequired()])
-    submit = SubmitField('List Review')
+    submit = SubmitField('Change Review')
 
 @bp.route('/', methods=['GET', 'POST'])
 def product_list():
