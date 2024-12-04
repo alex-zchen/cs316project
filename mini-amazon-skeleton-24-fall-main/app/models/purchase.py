@@ -48,7 +48,9 @@ WHERE id = :id
     @staticmethod
     def if_purchased(uid, sid):
         rows = app.db.execute('''
-            SELECT Purchases.id, uid, pid, time_purchased, fulfilled, quantity, coupon_code
+            SELECT Purchases.id, Purchases.uid, Purchases.pid, 
+                   Purchases.time_purchased, Purchases.fulfilled, 
+                   Purchases.quantity, Purchases.coupon_code
             FROM Purchases, Products
             WHERE Purchases.uid = :uid
             AND Purchases.pid = Products.id
@@ -57,7 +59,7 @@ WHERE id = :id
             ''',
             uid=uid,
             sid=sid)
-        return [Purchase(*(rows[0]))]  if rows else None
+        return [Purchase(*(rows[0]))] if rows else None
 
     @staticmethod
     def if_purchased_item(uid, pid):

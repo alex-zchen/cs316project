@@ -103,5 +103,6 @@ def update_fulfillment(purchase_id):
         AND fulfilled = FALSE
         """,
         purchase_id=purchase_id)
+    
     flash('Order marked as fulfilled!')
     return redirect(url_for('sellerpage.seller', view='sold')) 

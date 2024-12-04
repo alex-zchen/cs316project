@@ -87,3 +87,57 @@ def seller_change(seller_id):
         return jsonfiy({}), 404
     
     return redirect(url_for('sellerreviewpage.sellerreviewpagebackend'))
+
+# Add new route for handling reviews from public page:
+@bp.route('/seller_review_from_public/<int:seller_id>', methods=['POST'])
+def seller_review_from_public(seller_id):
+    if not current_user.is_authenticated:
+        flash('Please log in to leave a review.')
+        return redirect(url_for('users.pubPage', user_id=seller_id))
+        
+    # Verify purchase
+    if not Purchase.if_purchased(current_user.id, seller_id):
+        flash('You must purchase from this seller before leaving a review.')
+        return redirect(url_for('users.pubPage', user_id=seller_id))
+    
+    # Get review score from form
+    rscore = request.form.get('rscore')
+    if not rscore or not (0 <= int(rscore) <= 5):
+        flash('Please provide a valid rating between 0 and 5.')
+        return redirect(url_for('users.pubPage', user_id=seller_id))
+    
+    # Check if review already exists
+    existing_review = SellerReviewReview.check_by_uid_for_sid(current_user.id, seller_id)
+    if existing_review:
+        flash('You have already reviewed this seller.')
+        return redirect(url_for('users.pubPage', user_id=seller_id))
+    
+    # Add the review
+    if SellerReviewReview.reviewSeller(current_user.id, seller_id, int(rscore), datetime.now()):
+        flash('Review successfully posted!')
+    else:
+        flash('Error posting review.')
+    
+    return redirect(url_for('users.pubPage', user_id=seller_id))
+
+@bp.route('/seller_delete_from_public/<int:seller_id>', methods=['POST'])
+def seller_delete_from_public(seller_id):
+    if current_user.is_authenticated:
+        SellerReviewReview.delete_seller_id(current_user.id, seller_id)
+        flash('Review deleted successfully!')
+    return redirect(url_for('users.pubPage', user_id=seller_id))
+
+@bp.route('/seller_change_from_public/<int:seller_id>', methods=['POST'])
+def seller_change_from_public(seller_id):
+    if not current_user.is_authenticated:
+        flash('Please log in to update your review.')
+        return redirect(url_for('users.pubPage', user_id=seller_id))
+    
+    rscore = request.form.get('rscore')
+    if not rscore or not (1 <= int(rscore) <= 5):
+        flash('Please provide a valid rating between 1 and 5.')
+        return redirect(url_for('users.pubPage', user_id=seller_id))
+    
+    SellerReviewReview.update_rscore(current_user.id, seller_id, int(rscore), datetime.now())
+    flash('Review updated successfully!')
+    return redirect(url_for('users.pubPage', user_id=seller_id))

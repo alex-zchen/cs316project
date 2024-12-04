@@ -13,6 +13,8 @@ import io
 import matplotlib
 import matplotlib.pyplot as plt
 from flask import current_app as app
+from .sellerreviewpage import SellerReviewForm
+from .models.sellerreview import SellerReviewReview
 
 from flask import Blueprint
 bp = Blueprint('users', __name__)
@@ -75,10 +77,18 @@ def updateInfo():
     current_user.firstname = fname if fname else current_user.firstname
     current_user.lastname = lname if lname else current_user.lastname
     current_user.email = email if email else current_user.email
-    current_user.password = password if password else current_user.password
+    current_user.password = generate_password_hash(password) if password else current_user.password
     current_user.address = address if address else current_user.address
     current_user.balance = balance if balance else current_user.balance
-    current_user.update_info(id = current_user.id, email = current_user.email, firstname = current_user.firstname, lastname = current_user.lastname, balance = current_user.balance, password = current_user.password, address = current_user.address)
+    current_user.update_info(
+        id=current_user.id, 
+        email=current_user.email, 
+        firstname=current_user.firstname, 
+        lastname=current_user.lastname, 
+        balance=current_user.balance, 
+        password=current_user.password, 
+        address=current_user.address
+    )
     login()    
     user = current_user
     purchases = Purchase.get_all_by_uid_since(uid = user.id, since = -1)
@@ -228,9 +238,34 @@ def login():
 #Display public profile page for users using their publicly shown info, including seller-specific info. 
 @bp.route('/public_profile/<int:user_id>', methods=['GET'])
 def pubPage(user_id):
-    #Get user by ID
     user = User.get(user_id)
-    return render_template('publicpage.html', user=user)
+    has_purchased = False
+    existing_review = None
+    reviews = None
+    avg_rating = 0
+    
+    if current_user.is_authenticated:
+        # Check if user has purchased from this seller
+        purchase_check = Purchase.if_purchased(current_user.id, user_id)
+        has_purchased = purchase_check is not None
+        
+        # Get existing review if any
+        if has_purchased:
+            existing_review = SellerReviewReview.get_all_by_uid_for_sid(current_user.id, user_id)
+            if existing_review:
+                existing_review = existing_review[0]
+    
+    # Get all reviews for this seller
+    reviews = SellerReviewReview.get_all_by_sid(user_id)
+    if reviews:
+        avg_rating = sum(review.rscore for review in reviews) / len(reviews)
+    
+    return render_template('publicpage.html', 
+                         user=user,
+                         has_purchased=has_purchased,
+                         existing_review=existing_review,
+                         reviews=reviews,
+                         avg_rating=avg_rating)
 
 #New form for registering new users, inspired by mini amazon skeleton. Validates all fields and checks that email is unique.
 class RegistrationForm(FlaskForm):

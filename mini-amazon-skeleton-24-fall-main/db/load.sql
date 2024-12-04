@@ -2,6 +2,8 @@
 SELECT pg_catalog.setval('public.users_id_seq',
                          (SELECT MAX(id)+1 FROM Users),
                          false);
+--note that the passwords in users.csv are hashed password123
+
 
 \COPY Categories FROM 'Categories.csv' WITH DELIMITER ',' NULL '' CSV
 SELECT pg_catalog.setval('public.categories_id_seq',

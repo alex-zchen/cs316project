@@ -5,145 +5,267 @@
     .btn,
     button,
     input[type="submit"] {
-        background-color: #000000 !important;
-        color: #ffffff !important;
+        background-color: #000000;
+        color: #ffffff;
         border-color: #000000;
     }
 
     .btn:hover,
     button:hover,
     input[type="submit"]:hover {
-        background-color: #333333 !important;
+        background-color: #333333;
         border-color: #333333;
+    }
+
+    .container {
+        margin: 0 auto;
+        padding: 2rem 1rem;
+    }
+
+    .alert {
+        padding: 1rem;
+        margin-bottom: 1rem;
+        border-radius: 0.25rem;
+    }
+
+    .alert-info {
+        background-color: #e2e8f0;
+    }
+
+    .product-container {
+        max-width: 56rem;
+        margin: 0 auto;
+        background-color: white;
+        border-radius: 0.5rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+    }
+
+    .product-layout {
+        display: flex;
+    }
+
+    .product-image {
+        height: 50%;
+        width: 50%;
+        overflow: hidden;
+    }
+
+    .product-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .no-image {
+        width: 100%;
+        height: 100%;
+        background-color: #e2e8f0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #6b7280;
+    }
+
+    .product-details {
+        padding: 2rem;
+        width: 50%;
+    }
+
+    .product-id {
+        text-transform: uppercase;
+        font-size: 0.875rem;
+        color: #6366f1;
+        font-weight: 600;
+    }
+
+    .product-name {
+        margin-top: 0.5rem;
+        font-size: 1.875rem;
+        font-weight: bold;
+        color: #111827;
+    }
+
+    .product-price {
+        margin-top: 1rem;
+        font-size: 1.875rem;
+        font-weight: bold;
+        color: #111827;
+    }
+
+    .product-description {
+        margin-top: 1rem;
+        color: #4b5563;
+    }
+
+    .product-meta {
+        margin-top: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .seller-section {
+        margin-top: 1.5rem;
+    }
+
+    .seller-card {
+        border: 1px solid #e5e7eb;
+        border-radius: 0.25rem;
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .seller-info {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .seller-link {
+        color: #2563eb;
+        text-decoration: none;
+    }
+
+    .seller-link:hover {
+        text-decoration: underline;
+    }
+
+    .stock-available {
+        color: #059669;
+    }
+
+    .stock-unavailable {
+        color: #dc2626;
+    }
+
+    .quantity-input {
+        width: 5rem;
+        padding: 0.5rem;
+        border: 1px solid #e5e7eb;
+        border-radius: 0.25rem;
+    }
+
+    .reviews-section {
+        margin-top: 2rem;
+    }
+
+    .reviews-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .reviews-table th,
+    .reviews-table td {
+        padding: 0.75rem;
+        border-bottom: 1px solid #e5e7eb;
+        text-align: left;
+    }
+
+    .form-group {
+        margin-bottom: 1rem;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 0.5rem;
+        border: 1px solid #e5e7eb;
+        border-radius: 0.25rem;
     }
 </style>
 
-<div class="container mx-auto px-4 py-8">
-    <!-- Add flash messages section -->
+<div class="container">
     {% with messages = get_flashed_messages() %}
     {% if messages %}
     {% for message in messages %}
-    <div class="alert alert-info" role="alert">
+    <div class="alert alert-info">
         {{ message }}
     </div>
     {% endfor %}
     {% endif %}
     {% endwith %}
 
-    <div class="max-w-4xl mx-auto bg-white rounded-lg shadow-md overflow-hidden">
-        <div class="md:flex">
-            <!-- Product Image -->
-            <div style="height: 50%; width: 50%; overflow: hidden;">
+    <div class="product-container">
+        <div class="product-layout">
+            <div class="product-image">
                 {% if product.image_url %}
                 <a href="{{ url_for('products.product_detail', product_id=product.id) }}">
-                    <img src="{{ product.image_url }}" alt="{{ product.name }}"
-                        style="width: 100%; height: 100%; object-fit: cover;">
+                    <img src="{{ product.image_url }}" alt="{{ product.name }}">
                 </a>
                 {% else %}
-                <div class="w-full h-full bg-gray-200 flex items-center justify-center">
-                    <span class="text-gray-500">No image available</span>
+                <div class="no-image">
+                    <span>No image available</span>
                 </div>
                 {% endif %}
             </div>
 
-            <!-- Product Details Section -->
-            <div class="p-8 md:w-1/2">
-                <div class="uppercase tracking-wide text-sm text-indigo-500 font-semibold">
+            <div class="product-details">
+                <div class="product-id">
                     Product ID: {{ product.id }}
                 </div>
 
-                <h1 class="mt-2 text-3xl font-bold text-gray-900">{{ product.name }}</h1>
+                <h1 class="product-name">{{ product.name }}</h1>
 
-                <!-- Price -->
-                <div class="mt-4">
-                    <span class="text-3xl font-bold text-gray-900">${{ "%.2f"|format(product.price) }}</span>
-                </div>
+                <div class="product-price">${{ "%.2f"|format(product.price) }}</div>
 
-                <!-- Rating -->
-                <div class="mt-4 flex items-center">
-                    <div class="flex">
-                        {% for i in range(5) %}
-                        <span
-                            class="text-xl {% if i < product.avg_rating|int %}text-yellow-400{% else %}text-gray-300{% endif %}">★</span>
-                        {% endfor %}
-                    </div>
-                    <span class="ml-2 text-gray-600">
-                        {{ "%.1f"|format(product.avg_rating) }} ({{ product.review_count }} reviews)
+                <div>
+                    <span>
+                        {{ product.avg_rating }} stars ({{ product.review_count }} reviews)
                     </span>
                 </div>
 
-                <!-- Description -->
                 {% if product.description %}
-                <div class="mt-4">
-                    <h2 class="text-xl font-semibold mb-2">Description</h2>
-                    <p class="text-gray-600">{{ product.description }}</p>
+                <div class="product-description">
+                    <h2>Description</h2>
+                    <p>{{ product.description }}</p>
                 </div>
                 {% endif %}
 
-                <!-- Additional Details -->
-                <div class="mt-6 space-y-2">
-                    <p class="text-gray-600">
-                        <span class="font-semibold">Category:</span>
+                <div class="product-meta">
+                    <p>
+                        <span>Category:</span>
                         {{ Category.get_name(product.category_id) if product.category_id else "Uncategorized" }}
                     </p>
-                    <p class="text-gray-600">
-                        <span class="font-semibold">Seller ID: (Click for more info)</span>
-                        <a href="{{ url_for('users.pubPage', user_id=product.seller_id) }}">{{product.seller_id }}</a>
+                    <p>
+                        <span>Seller ID: (Click for more info)</span>
+                        <a href="{{ url_for('users.pubPage', user_id=product.seller_id) }}" class="seller-link">{{product.seller_id }}</a>
                     </p>
 
-                    
-
-
-                    <p class="text-gray-600">
-                        <span class="font-semibold">Status:</span>
+                    <p>
+                        <span>Status:</span>
                         {% if product.available and product.quantity is not none and product.quantity > 0 %}
-                        <span class="text-green-600">{{ product.quantity }} in Stock</span>
+                        <span class="stock-available">{{ product.quantity }} in Stock</span>
                         {% else %}
-                        <span class="text-red-600">Out of Stock</span>
+                        <span class="stock-unavailable">Out of Stock</span>
                         {% endif %}
                     </p>
 
-                    <!-- Sellers Section -->
-                    <div class="mt-6">
-                        <h2 class="text-xl font-semibold mb-4">Available Sellers</h2>
-                        <div class="space-y-4">
+                    <div class="seller-section">
+                        <h2>Available Sellers</h2>
+                        <div>
                             {% for seller in sellers %}
-                            <div class="border rounded p-4">
-                                <div class="flex justify-between items-center">
+                            <div class="seller-card">
+                                <div class="seller-info">
                                     <div>
-                                        <a href="{{ url_for('users.pubPage', user_id=seller.seller_id) }}" 
-                                           class="text-blue-600 hover:underline">
+                                        <a href="{{ url_for('users.pubPage', user_id=seller.seller_id) }}" class="seller-link">
                                             Seller ID: {{ seller.seller_id }}
                                         </a>
-                                        <p class="text-gray-600">Price: ${{ "%.2f"|format(seller.price) }}</p>
-                                        <p class="text-gray-600">
+                                        <p>Price: ${{ "%.2f"|format(seller.price) }}</p>
+                                        <p>
                                             {% if seller.quantity > 0 %}
-                                            <span class="text-green-600">{{ seller.quantity }} in Stock</span>
+                                            <span class="stock-available">{{ seller.quantity }} in Stock</span>
                                             {% else %}
-                                            <span class="text-red-600">Out of Stock</span>
+                                            <span class="stock-unavailable">Out of Stock</span>
                                             {% endif %}
                                         </p>
                                     </div>
                                     {% if seller.quantity > 0 and current_user.is_authenticated %}
-                                    <form action="{{ url_for('products.add_to_cart', product_id=product.id, seller_id=seller.seller_id) }}" 
-                                          method="POST" 
-                                          class="flex items-center gap-2">
-                                        <input type="number" 
-                                               name="quantity" 
-                                               value="1" 
-                                               min="1" 
-                                               max="{{ seller.quantity }}" 
-                                               class="w-20 p-2 border rounded">
-                                        <button type="submit" 
-                                                class="bg-black text-white px-4 py-2 rounded hover:bg-gray-800">
-                                            Add to Cart
-                                        </button>
+                                    <form action="{{ url_for('products.add_to_cart', product_id=product.id, seller_id=seller.seller_id) }}" method="POST">
+                                        <input type="number" name="quantity" value="1" min="1" max="{{ seller.quantity }}" class="quantity-input">
+                                        <button type="submit">Add to Cart</button>
                                     </form>
                                     {% elif not current_user.is_authenticated %}
-                                    <a href="{{ url_for('users.login') }}" 
-                                       class="bg-black text-white px-4 py-2 rounded hover:bg-gray-800">
-                                        Login to Buy
-                                    </a>
+                                    <a href="{{ url_for('users.login') }}">Login to Buy</a>
                                     {% endif %}
                                 </div>
                             </div>
@@ -151,50 +273,61 @@
                         </div>
                     </div>
 
-                    <!-- Reviews Section -->
-                    <div class="mt-8">
-                        <h2 class="text-xl font-semibold mb-4">Product Reviews</h2>
+                    <div class="reviews-section">
+                        <h2>Recent Reviews</h2>
+                        
                         {% if purchased %}
-                        <br>
-                        <p class="text-gray-600">
-                            <span class="font-semibold">Since you bought this product, leave a review: </span>
-                        </p>
-                        <form action="" method="post">
-                            {{ form.hidden_tag() }}
-                            <p>
-                                {{ form.rscore.label }}<br />
-                                {{ form.rscore(size=32) }}<br />
-                                {% for error in form.rscore.errors %}
-                                <span style="color: red;">[{{ error }}]</span>
-                                {% endfor %}
-                            </p>
-                            <p>{{ form.submit() }}</p>
-                        </form>
+                            {% if form %}
+                                <form method="POST">
+                                    {{ form.hidden_tag() }}
+                                    <div class="form-group">
+                                        <label for="rscore">Rating (1-5):</label>
+                                        <input type="number" class="form-control" id="rscore" name="rscore" min="1" max="5" required>
+                                    </div>
+                                    <button type="submit">Submit Review</button>
+                                </form>
+                            {% endif %}
                         {% endif %}
 
                         {% if reviews %}
-                        <div class="space-y-4">
-                            {% for review in reviews %}
-                            <div class="border rounded p-4">
-                                <div class="flex items-center gap-2 mb-2">
-                                    <div class="flex">
-                                        {% for i in range(5) %}
-                                        <span class="text-lg {% if i < review.rscore %}text-yellow-400{% else %}text-gray-300{% endif %}">★</span>
-                                        {% endfor %}
-                                    </div>
-                                    <span class="text-gray-600">by User {{ review.uid }}</span>
-                                    <span class="text-gray-400">{{ review.time_reviewed.strftime('%Y-%m-%d') }}</span>
-                                </div>
+                            <div>
+                                <p>Average Rating: {{ "%.1f"|format(product.avg_rating) }} / 5.0 ({{ product.review_count }} reviews)</p>
                             </div>
-                            {% endfor %}
-                        </div>
+                            <table class="reviews-table">
+                                <thead>
+                                    <tr>
+                                        <th>Reviewer</th>
+                                        <th>Rating</th>
+                                        <th>Date</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for review in reviews %}
+                                    <tr>
+                                        <td>{{ review.firstname }} {{ review.lastname }}</td>
+                                        <td>
+                                            {% for i in range(review.rscore) %}⭐{% endfor %}
+                                            ({{ review.rscore }}/5)
+                                        </td>
+                                        <td>{{ review.time_reviewed.strftime('%Y-%m-%d') }}</td>
+                                        <td>
+                                            {% if current_user.id == review.uid %}
+                                            <form action="{{ url_for('products.delete_review', product_id=product.id) }}" method="POST" style="display: inline;">
+                                                <input type="hidden" name="review_id" value="{{ review.id }}">
+                                                <button type="submit" onclick="return confirm('Are you sure you want to delete your review?')">Delete</button>
+                                            </form>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
                         {% else %}
-                        <p class="text-gray-600">No reviews yet.</p>
+                            <p>No reviews yet.</p>
                         {% endif %}
                     </div>
-
                 </div>
-
             </div>
         </div>
     </div>

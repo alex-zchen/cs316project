@@ -93,6 +93,80 @@
                 </tr>
             </tbody>
         </table>
+
+        <!-- Review Management Section -->
+        <div class="review-section">
+            {% if current_user.is_authenticated %}
+                {% if has_purchased %}
+                    {% if existing_review %}
+                        <h3>Your Review</h3>
+                        <div class="current-review">
+                            <p>
+                                {% for i in range(existing_review.rscore) %}⭐{% endfor %}
+                                ({{ existing_review.rscore }}/5)
+                            </p>
+                            <p>Posted on: {{ existing_review.time_reviewed.strftime('%Y-%m-%d') }}</p>
+                            
+                            <!-- Delete Review Button -->
+                            <form action="{{ url_for('sellerreviewpage.seller_delete_from_public', seller_id=user.id) }}" method="POST" style="display: inline;">
+                                <button type="submit" class="btn btn-danger">Delete Review</button>
+                            </form>
+                            
+                            <!-- Update Review Form -->
+                            <form method="POST" action="{{ url_for('sellerreviewpage.seller_change_from_public', seller_id=user.id) }}" class="mt-3">
+                                <div class="form-group">
+                                    <label for="rscore">Update Rating (1-5):</label>
+                                    <input type="number" class="form-control" id="rscore" name="rscore" min="1" max="5" required>
+                                </div>
+                                <button type="submit" class="btn btn-primary mt-2">Update Review</button>
+                            </form>
+                        </div>
+                    {% else %}
+                        <h3>Leave a Review</h3>
+                        <form method="POST" action="{{ url_for('sellerreviewpage.seller_review_from_public', seller_id=user.id) }}">
+                            <div class="form-group">
+                                <label for="rscore">Rating (1-5):</label>
+                                <input type="number" class="form-control" id="rscore" name="rscore" min="1" max="5" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary mt-2">Submit Review</button>
+                        </form>
+                    {% endif %}
+                {% else %}
+                    <p>You must purchase from this seller before leaving a review.</p>
+                {% endif %}
+            {% endif %}
+
+            <!-- Reviews Display Section -->
+            <div class="seller-reviews mt-4">
+                <h3>Seller Reviews</h3>
+                {% if reviews %}
+                    <div class="reviews-stats">
+                        <p>Average Rating: {{ "%.1f"|format(avg_rating) }} / 5.0 ({{ reviews|length }} reviews)</p>
+                    </div>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Rating</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for review in reviews %}
+                            <tr>
+                                <td>
+                                    {% for i in range(review.rscore) %}⭐{% endfor %}
+                                    ({{ review.rscore }}/5)
+                                </td>
+                                <td>{{ review.time_reviewed.strftime('%Y-%m-%d') }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <p>No reviews yet.</p>
+                {% endif %}
+            </div>
+        </div>
     </div>
 </body>
 </html>
