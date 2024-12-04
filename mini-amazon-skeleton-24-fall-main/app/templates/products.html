@@ -5,14 +5,36 @@
     <h1 class="text-3xl font-bold mb-8">Our Products</h1>
 
     <style>
-        .btn, button, input[type="submit"] {
-            background-color: #000000 !important;
-            color: #ffffff !important;
+        .btn {
+            background-color: #000000;
+            color: #ffffff;
             border-color: #000000;
         }
         
-        .btn:hover, button:hover, input[type="submit"]:hover {
-            background-color: #333333 !important;
+        button {
+            background-color: #000000;
+            color: #ffffff;
+            border-color: #000000;
+        }
+
+        input[type="submit"] {
+            background-color: #000000;
+            color: #ffffff;
+            border-color: #000000;
+        }
+        
+        .btn:hover {
+            background-color: #333333;
+            border-color: #333333;
+        }
+
+        button:hover {
+            background-color: #333333;
+            border-color: #333333;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #333333;
             border-color: #333333;
         }
 
@@ -44,6 +66,59 @@
             border-color: #000;
             color: white;
         }
+
+        .search-input {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.25rem;
+        }
+
+        .filter-select {
+            padding: 0.5rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.25rem;
+        }
+
+        .apply-button {
+            background-color: #000;
+            color: #fff;
+            padding: 0.5rem 1rem;
+            border-radius: 0.25rem;
+        }
+
+        .apply-button:hover {
+            background-color: #333;
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(1, 1fr);
+            gap: 1.5rem;
+        }
+
+        @media (min-width: 768px) {
+            .product-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .product-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (min-width: 1280px) {
+            .product-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        .ellipsis {
+            padding: 0.75rem;
+            color: #6b7280;
+        }
     </style>
 
     {% with messages = get_flashed_messages() %}
@@ -64,10 +139,10 @@
                        name="search" 
                        value="{{ search_query }}"
                        placeholder="Search by ID, name, or description..." 
-                       class="w-full p-2 border rounded">
+                       class="search-input">
             </div>
             <div class="flex gap-2">
-                    <select name="category" class="p-2 border rounded">
+                    <select name="category" class="filter-select">
                         <option value="all" {% if category == 'all' %}selected{% endif %}>All Categories</option>
                         {% for cat_id, cat_name in categories %}
                             <option value="{{ cat_id }}" {% if category|string == cat_id|string %}selected{% endif %}>
@@ -75,16 +150,16 @@
                             </option>
                         {% endfor %}
                 </select>
-                <select name="sort_by" class="p-2 border rounded">
+                <select name="sort_by" class="filter-select">
                     <option value="id" {% if sort_by == 'id' %}selected{% endif %}>Sort By</option>
                     <option value="price" {% if sort_by == 'price' %}selected{% endif %}>Price</option>
                     <option value="rating" {% if sort_by == 'rating' %}selected{% endif %}>Rating</option>
                 </select>
-                <select name="sort_order" class="p-2 border rounded">
+                <select name="sort_order" class="filter-select">
                     <option value="desc" {% if sort_order == 'desc' %}selected{% endif %}>Descending</option>
                     <option value="asc" {% if sort_order == 'asc' %}selected{% endif %}>Ascending</option>
                 </select>
-                <button type="submit" class="bg-black text-white px-4 py-2 rounded hover:bg-gray-800">
+                <button type="submit" class="apply-button">
                     Apply
                 </button>
             </div>
@@ -92,60 +167,22 @@
     </form>
 
     <!-- Products Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+    <div class="product-grid">
         {% for product in products %}
-        <div class="bg-white rounded-lg shadow-md overflow-hidden max-w-sm">
-            <!-- Product Image -->
-            <div style="height: 200px; width: 100%; overflow: hidden;">
-                {% if product.image_url %}
-                <a href="{{ url_for('products.product_detail', product_id=product.id) }}">
-                    <img src="{{ product.image_url }}" 
-                         alt="{{ product.name }}" 
-                         style="width: 100%; height: 100%; object-fit: cover;">
-                </a>
-                {% else %}
-                <div class="w-full h-full bg-gray-200 flex items-center justify-center">
-                    <span class="text-gray-500">No image available</span>
-                </div>
-                {% endif %}
-            </div>
+        <div class="product-card">
+            {% if product.image_url %}
+                <img src="{{ product.image_url }}" alt="{{ product.name }}">
+            {% endif %}
             
-            <div class="p-4">
-                <!-- Product Name - Now Clickable -->
-                <a href="{{ url_for('products.product_detail', product_id=product.id) }}" 
-                   class="block hover:text-blue-600">
-                    <h2 class="text-xl font-semibold mb-2">{{ product.name }}</h2>
-                </a>
-
-                <!-- Product Description -->
-                {% if product.description %}
-                <p class="text-gray-600 mb-2 text-sm" style="height: 3em; overflow: hidden;">
-                    {{ product.description }}
+            <div class="product-info">
+                <h2>{{ product.name }}</h2>
+                <p class="price">${{ "%.2f"|format(product.price) }}</p>
+                <p class="rating">
+                    {% for i in range(product.avg_rating|int) %}⭐{% endfor %}
+                    ({{ "%.1f"|format(product.avg_rating) }}/5.0)
+                    ({{ product.review_count }} reviews)
                 </p>
-                {% endif %}
-                
-                <!-- Rating Stars -->
-                <div class="flex items-center mb-2">
-                    <div class="flex items-center">
-                        <div class="flex">
-                            {% for i in range(5) %}
-                            <span class="text-lg {% if i < product.avg_rating|int %}text-yellow-400{% else %}text-gray-300{% endif %}">★</span>
-                            {% endfor %}
-                        </div>
-                        <span class="text-sm text-gray-600 ml-2">
-                            {{ "%.1f"|format(product.avg_rating) }} ({{ product.review_count }})
-                        </span>
-                    </div>
-                </div>
-
-                <!-- Price and View Details -->
-                <div class="flex justify-between items-center mt-4">
-                    <span class="text-lg font-bold">${{ "%.2f"|format(product.price) }}</span>
-                    <a href="{{ url_for('products.product_detail', product_id=product.id) }}" 
-                       class="bg-black text-white px-4 py-2 rounded hover:bg-gray-800 text-sm">
-                        View Details
-                    </a>
-                </div>
+                <a href="{{ url_for('products.product_detail', product_id=product.id) }}" class="btn">View Details</a>
             </div>
         </div>
         {% endfor %}
@@ -169,7 +206,7 @@
                     {{ p }}
                 </a>
             {% elif p == page - window_size - 1 or p == page + window_size + 1 %}
-                <span class="px-3 py-2 text-gray-500">...</span>
+                <span class="ellipsis">...</span>
             {% endif %}
         {% endfor %}
         
@@ -180,7 +217,6 @@
         </a>
         {% endif %}
     </div>
-
     {% endif %}
 </div>
 {% endblock %}

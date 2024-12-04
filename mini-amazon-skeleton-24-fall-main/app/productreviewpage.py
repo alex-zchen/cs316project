@@ -83,4 +83,4 @@ def product_change(product_id):
     else:
         return jsonfiy({}), 404
     
-    return redirect(url_for('productreviewpage.productreviewpagebackend'))
+    return redirect(url_for('users.user_reviews'))

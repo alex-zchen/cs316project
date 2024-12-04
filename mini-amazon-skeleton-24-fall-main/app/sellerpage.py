@@ -50,7 +50,7 @@ def seller():
             flash("Product listed successfully!")
             return redirect(url_for('sellerpage.seller'))
         else: 
-            flash("Error listing product: Quantity or Price cannot be negative")
+            flash("Error listing product")
     
     products = []
     if current_user.is_authenticated:
@@ -103,5 +103,6 @@ def update_fulfillment(purchase_id):
         AND fulfilled = FALSE
         """,
         purchase_id=purchase_id)
+    
     flash('Order marked as fulfilled!')
     return redirect(url_for('sellerpage.seller', view='sold')) 

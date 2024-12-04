@@ -136,3 +136,16 @@ def add_to_cart(product_id):
     return redirect(url_for('products.product_detail', product_id=product_id))
 
 
+@bp.route('/products/<int:product_id>/delete_review', methods=['POST'])
+@login_required
+def delete_review(product_id):
+    try:
+        # Delete the review
+        AllReviews.delete_product_id(current_user.id, product_id)
+        flash('Review deleted successfully!', 'success')
+    except Exception as e:
+        flash('Error deleting review: ' + str(e), 'error')
+    
+    return redirect(url_for('products.product_detail', product_id=product_id))
+
+

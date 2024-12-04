@@ -231,6 +231,14 @@ class Cart:
                 """, 
                 uid=uid)
 
+                # Clear the user's active coupon after purchase
+                app.db.execute("""
+                    UPDATE Users 
+                    SET active_coupon = NULL
+                    WHERE id = :uid
+                """,
+                uid=uid)
+
                 # Return the IDs of the purchases made
                 return [row[0] for row in rows]
 

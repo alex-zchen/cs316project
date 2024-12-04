@@ -81,7 +81,7 @@ SELECT id, uid, pid, rscore, time_reviewed, for_seller
 FROM ProductReviews
 WHERE pid = :pid
 AND for_seller = FALSE
-ORDER BY time_reivewed DESC
+ORDER BY time_reviewed DESC
 ''',
                               pid=pid)
         return [AllReviews(*row) for row in rows] 
@@ -146,11 +146,12 @@ AND uid = :uid
     @staticmethod
     def get_product_reviews(pid):
         rows = app.db.execute('''
-            SELECT uid, pid, rscore, time_reviewed
-            FROM ProductReviews
-            WHERE pid = :pid
-            AND for_seller = FALSE
-            ORDER BY time_reviewed DESC
+            SELECT pr.uid, pr.pid, pr.rscore, pr.time_reviewed, u.firstname, u.lastname
+            FROM ProductReviews pr
+            JOIN Users u ON pr.uid = u.id
+            WHERE pr.pid = :pid
+            AND pr.for_seller = FALSE
+            ORDER BY pr.time_reviewed DESC
         ''',
         pid=pid)
         return rows

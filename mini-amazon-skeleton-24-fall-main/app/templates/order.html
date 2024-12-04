@@ -5,11 +5,16 @@
 <p>Order Time: {{ timestamp }}</p>
 <p>User ID: {{ uid }}</p>
 
+<div class="alert alert-info">
+    <i class="fa fa-info-circle"></i> Click on any product name or seller name below to visit their page and leave a review!
+</div>
+
 <table class="table table-striped">
     <thead>
         <tr>
             <th>Purchase Date</th>
             <th>Product Name</th>
+            <th>Seller</th>
             <th>Quantity</th>
             <th>Amount Paid</th>
             <th>Fulfillment Status</th>
@@ -20,6 +25,7 @@
         <tr>
             <td>{{ purchase.PurchaseDate }}</td>
             <td><a href="{{ url_for('products.product_detail', product_id=purchase.ProductID) }}">{{ purchase.ProductName }}</a></td>
+            <td><a href="{{ url_for('users.pubPage', user_id=purchase.SellerID) }}">{{ purchase.SellerName }}</a></td>
             <td>{{ purchase.Quantity }}</td>
             <td>${{ purchase.Amount_Paid }}</td>
             <td>{{ purchase.Fulfillment_Status }}</td>

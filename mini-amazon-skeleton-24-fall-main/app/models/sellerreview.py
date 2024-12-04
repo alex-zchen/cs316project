@@ -66,7 +66,7 @@ SELECT id, uid, sid, rscore, time_reviewed, for_seller
 FROM SellerReviews
 WHERE sid = :sid
 AND for_seller = TRUE
-ORDER BY time_reivewed DESC
+ORDER BY time_reviewed DESC
 ''',
                               sid=sid)
         return [SellerReviewReview(*row) for row in rows] 
