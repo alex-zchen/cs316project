@@ -31,7 +31,7 @@
                         {% if review.for_seller %}
                             <a href="{{ url_for('users.pubPage', user_id=review.sid) }}">{{ review.seller_name }}</a>
                         {% else %}
-                            <a href="{{ url_for('products.product_detail', id=review.pid) }}">{{ review.product_name }}</a>
+                            <a href="{{ url_for('products.product_detail', product_id=review.pid) }}">{{ review.product_name }}</a>
                         {% endif %}
                     </td>
                     <td>
