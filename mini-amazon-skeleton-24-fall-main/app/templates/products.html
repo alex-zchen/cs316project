@@ -180,6 +180,7 @@
                 <p class="rating">
                     {% for i in range(product.avg_rating|int) %}⭐{% endfor %}
                     ({{ "%.1f"|format(product.avg_rating) }}/5.0)
+                    ({{ product.review_count }} reviews)
                 </p>
                 <a href="{{ url_for('products.product_detail', product_id=product.id) }}" class="btn">View Details</a>
             </div>

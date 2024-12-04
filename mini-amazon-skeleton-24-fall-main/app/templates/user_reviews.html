@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>My Reviews</h2>
+    
+    {% if reviews %}
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Rating</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for review in reviews %}
+                <tr>
+                    <td>{{ review.time_reviewed.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                    <td>
+                        {% if review.for_seller %}
+                            Seller Review
+                        {% else %}
+                            Product Review
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if review.for_seller %}
+                            <a href="{{ url_for('users.pubPage', user_id=review.sid) }}">{{ review.seller_name }}</a>
+                        {% else %}
+                            <a href="{{ url_for('products.product_detail', id=review.pid) }}">{{ review.product_name }}</a>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <form method="POST" action="{% if review.for_seller %}{{ url_for('sellerreviewpage.seller_change_from_public', seller_id=review.sid) }}{% else %}{{ url_for('productreviewpage.product_change', product_id=review.pid) }}{% endif %}" class="d-inline">
+                            <input type="number" name="rscore" value="{{ review.rscore }}" min="1" max="5" class="form-control form-control-sm d-inline" style="width: 70px;">
+                            <button type="submit" class="btn btn-primary btn-sm">Update</button>
+                        </form>
+                    </td>
+                    <td>
+                        <form action="{% if review.for_seller %}{{ url_for('sellerreviewpage.seller_delete_from_public', seller_id=review.sid) }}{% else %}{{ url_for('productreviewpage.product_delete', product_id=review.pid) }}{% endif %}" 
+                              method="POST" class="d-inline">
+                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p>You haven't written any reviews yet.</p>
+    {% endif %}
+</div>
+{% endblock %} 

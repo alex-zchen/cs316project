@@ -8,13 +8,14 @@ from datetime import datetime
 from .models.user import User
 from .models.purchase import Purchase
 from .models.product import Product
+from .models.productreview import AllReviews
+from .models.sellerreview import SellerReviewReview
 import base64
 import io
 import matplotlib
 import matplotlib.pyplot as plt
 from flask import current_app as app
 from .sellerreviewpage import SellerReviewForm
-from .models.sellerreview import SellerReviewReview
 
 from flask import Blueprint
 bp = Blueprint('users', __name__)
@@ -326,6 +327,9 @@ def order_page(uid, timestamp):
         product = Product.get(purchase.pid)
         price = float(product.price)
         
+        # Get seller information
+        seller = User.get(product.seller_id)
+        
         # Apply coupon discount if applicable
         if purchase.coupon_code:
             discount = app.db.execute('''
@@ -339,6 +343,8 @@ def order_page(uid, timestamp):
         purchaseObj['PurchaseDate'] = purchase.time_purchased
         purchaseObj["ProductName"] = product.name
         purchaseObj['ProductID'] = product.id
+        purchaseObj['SellerID'] = seller.id
+        purchaseObj['SellerName'] = f"{seller.firstname} {seller.lastname}"
         purchaseObj['Quantity'] = purchase.quantity
         purchaseObj['Amount_Paid'] = "{:.2f}".format(price * purchase.quantity)
         purchaseObj['Fulfillment_Status'] = "Not yet shipped" if not purchase.fulfilled else "Shipped"
@@ -348,3 +354,26 @@ def order_page(uid, timestamp):
                          purchases=productPurchases, 
                          timestamp=timestamp, 
                          uid=uid)
+
+@bp.route("/my-reviews", methods=["GET"])
+def user_reviews():
+    if not current_user.is_authenticated:
+        return redirect(url_for('users.login'))
+    
+    # Get all seller reviews authored by the user
+    seller_reviews = SellerReviewReview.get_all_by_uid(current_user.id)
+    for review in seller_reviews:
+        seller = User.get(review.sid)
+        review.seller_name = f"{seller.firstname} {seller.lastname}"
+    
+    # Get all product reviews authored by the user
+    product_reviews = AllReviews.get_all_by_uid(current_user.id)
+    for review in product_reviews:
+        product = Product.get(review.pid)
+        review.product_name = product.name
+    
+    # Combine and sort all reviews by timestamp in reverse chronological order
+    all_reviews = seller_reviews + product_reviews
+    all_reviews.sort(key=lambda x: x.time_reviewed, reverse=True)
+    
+    return render_template('user_reviews.html', reviews=all_reviews)

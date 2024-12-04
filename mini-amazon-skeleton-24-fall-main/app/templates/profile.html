@@ -56,6 +56,11 @@
         <a href="{{ url_for('sellerpage.seller') }}">click here</a>.
         If you want to see your public page, <a href="{{ url_for('users.pubPage', user_id=user.id) }}">click here</a>.
     </p>
+    <!-- Add this after the user info table but before the orders table -->
+    <p style="margin-left: 5%;">
+        View and manage your reviews: 
+        <a href="{{ url_for('users.user_reviews') }}">My Reviews</a>
+    </p>
     <!--Table for user info-->
     <div class="table-container">
         <table class="table profile-table">
