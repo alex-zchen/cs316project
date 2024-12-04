@@ -1,0 +1,12 @@
+To Fix: 
+Changing email to prexisting user
+SQL Injection Protection
+On Cart -> LogOut -> Back Button should flash message not error
+cite css in readme      
+cite scraped website
+check matplotlib
+clean and comment code
+
+For Video:
+Demonstrate Out of Stock products can't be bought
+purchase history graph
