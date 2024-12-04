@@ -29,39 +29,43 @@ class PromoForm(FlaskForm):
 def carts():
     # userid
     user_cart = {}
-    userid = current_user.id
-    # find total price and cart:
-    if(current_user.is_authenticated):
-        user_cart = Cart.get(userid)
-    total_price = Cart.get_total_price(userid)
+    if('current_user' in locals()):
+        userid = current_user.id
+        # find total price and cart:
+        if(current_user.is_authenticated):
+            user_cart = Cart.get(userid)
+        total_price = Cart.get_total_price(userid)
 
-    # Get coupon discount if any
-    discount_info = Cart.get_active_discount(userid)
-    discount_percent = discount_info['percent'] if discount_info else None
-    discount_amount = (total_price * discount_percent / 100) if discount_percent else 0
-    final_total = total_price - discount_amount
-    
-    if request.method == 'POST':
-        # Call the buy_cart method to move items from cart to purchases
-        purchase_ids = Cart.buy_cart(userid)
-        if purchase_ids:
-            flash('Successfully Purchased Items. You can view your purchase history in your profile page.')
-        else:
-            flash('An error occurred while purchasing items. You might not have enough balance or the products you want to buy might not have enough quantity.')
+        # Get coupon discount if any
+        discount_info = Cart.get_active_discount(userid)
+        discount_percent = discount_info['percent'] if discount_info else None
+        discount_amount = (total_price * discount_percent / 100) if discount_percent else 0
+        final_total = total_price - discount_amount
         
-        return redirect(url_for('carts.carts'))
+        if request.method == 'POST':
+            # Call the buy_cart method to move items from cart to purchases
+            purchase_ids = Cart.buy_cart(userid)
+            if purchase_ids:
+                flash('Successfully Purchased Items. You can view your purchase history in your profile page.')
+            else:
+                flash('An error occurred while purchasing items. You might not have enough balance or the products you want to buy might not have enough quantity.')
+            
+            return redirect(url_for('carts.carts'))
+    else:
+        flash('Login to see your cart!')
+        return redirect(url_for('users.login'))
 
 
-    # render the page by adding information to the index.html file
-    return render_template('carts.html',
-                           ucart=user_cart,
-                           total="{:.2f}".format(total_price), 
-                           discount_percent=discount_percent,
-                           discount_amount="{:.2f}".format(discount_amount),
-                           final_total="{:.2f}".format(final_total),
-                           prices = [Product.get(i.pid).price for i in user_cart], 
-                           length = len(user_cart),
-                           names = [Product.get(i.pid).name for i in user_cart])
+        # render the page by adding information to the index.html file
+        return render_template('carts.html',
+                            ucart=user_cart,
+                            total="{:.2f}".format(total_price), 
+                            discount_percent=discount_percent,
+                            discount_amount="{:.2f}".format(discount_amount),
+                            final_total="{:.2f}".format(final_total),
+                            prices = [Product.get(i.pid).price for i in user_cart], 
+                            length = len(user_cart),
+                            names = [Product.get(i.pid).name for i in user_cart])
 
 @bp.route('/delete/<int:uid>/<int:pid>', methods=['POST'])
 def delete(uid, pid):
