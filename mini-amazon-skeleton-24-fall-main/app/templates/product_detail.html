@@ -172,6 +172,31 @@
         border: 1px solid #e5e7eb;
         border-radius: 0.25rem;
     }
+
+    .original-seller {
+        border: 2px solid #2563eb;
+        background-color: #f0f7ff;
+    }
+    
+    .original-seller-badge {
+        background-color: #2563eb;
+        color: white;
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.25rem;
+        font-size: 0.875rem;
+        margin-bottom: 0.5rem;
+        display: inline-block;
+    }
+    
+    .product-link {
+        color: #2563eb;
+        text-decoration: none;
+        margin-left: 1rem;
+    }
+    
+    .product-link:hover {
+        text-decoration: underline;
+    }
 </style>
 
 <div class="container">
@@ -223,14 +248,20 @@
 
                 <div class="product-meta">
                     <div class="seller-section">
-                        <h2>Available Sellers</h2>
+                        <h2>Sellers</h2>
                         <div>
                             {% for seller in sellers %}
-                            <div class="seller-card">
+                            <div class="seller-card {% if seller.is_original_seller %}original-seller{% endif %}">
                                 <div class="seller-info">
                                     <div>
+                                        {% if seller.is_original_seller %}
+                                        <strong class="original-seller-badge">Original Seller</strong>
+                                        {% endif %}
                                         <a href="{{ url_for('users.pubPage', user_id=seller.seller_id) }}" class="seller-link">
                                             Seller ID: {{ seller.seller_id }}
+                                        </a>
+                                        <a href="{{ url_for('products.product_detail', product_id=seller.id) }}" class="product-link">
+                                            View Listing
                                         </a>
                                         <p>Price: ${{ "%.2f"|format(seller.price) }}</p>
                                         <p>

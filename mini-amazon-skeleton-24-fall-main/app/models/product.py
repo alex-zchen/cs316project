@@ -193,6 +193,17 @@ LIMIT :k
             if price < 0:
                 return None
             
+            # Check if product already exists for this seller
+            existing = app.db.execute("""
+SELECT id FROM Products 
+WHERE name = :name AND seller_id = :seller_id
+""",
+                                    name=name,
+                                    seller_id=seller_id)
+            
+            if existing:
+                return None  # Product already exists for this seller
+            
             rows = app.db.execute("""
 INSERT INTO Products(name, seller_id, price, available, description, category_id, image_url, quantity)
 VALUES(:name, :seller_id, :price, :available, :description, :category_id, :image_url, :quantity)
@@ -242,15 +253,17 @@ RETURNING id
     @staticmethod
     def get_sellers(product_id):
         rows = app.db.execute('''
-            SELECT p.seller_id, p.price, p.quantity
-            FROM Products p
-            WHERE p.name = (
-                SELECT name 
+            WITH original_product AS (
+                SELECT name, seller_id as original_seller_id
                 FROM Products 
                 WHERE id = :product_id
             )
-            AND p.available = TRUE
+            SELECT p.id, p.seller_id, p.price, p.quantity,
+                   (p.seller_id = op.original_seller_id) as is_original_seller
+            FROM Products p
+            JOIN original_product op ON p.name = op.name
+            WHERE p.available = TRUE
             AND p.quantity > 0
-            ORDER BY p.price ASC
+            ORDER BY is_original_seller DESC, p.price ASC
         ''', product_id=product_id)
         return rows

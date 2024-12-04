@@ -50,7 +50,7 @@ def seller():
             flash("Product listed successfully!")
             return redirect(url_for('sellerpage.seller'))
         else: 
-            flash("Error listing product: Quantity or Price cannot be negative")
+            flash("Error listing product")
     
     products = []
     if current_user.is_authenticated:
