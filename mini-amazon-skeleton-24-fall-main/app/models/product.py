@@ -242,14 +242,15 @@ RETURNING id
     @staticmethod
     def get_sellers(product_id):
         rows = app.db.execute('''
-            SELECT p.seller_id, p.price, p.quantity,
-                   COALESCE(AVG(pr.rscore)::NUMERIC(10,1), 0) as seller_rating,
-                   COUNT(DISTINCT pr.id) as review_count
+            SELECT p.seller_id, p.price, p.quantity
             FROM Products p
-            LEFT JOIN ProductReviews pr ON p.seller_id = pr.uid AND pr.for_seller = TRUE
-            WHERE p.id = :product_id
-            GROUP BY p.seller_id, p.price, p.quantity
-            HAVING p.quantity > 0
+            WHERE p.name = (
+                SELECT name 
+                FROM Products 
+                WHERE id = :product_id
+            )
+            AND p.available = TRUE
+            AND p.quantity > 0
             ORDER BY p.price ASC
         ''', product_id=product_id)
         return rows

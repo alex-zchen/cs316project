@@ -65,18 +65,15 @@
     </a>
         <div style="color: aliceblue; text-align: right; margin-bottom: 25px">
       {% if current_user.is_authenticated %}
-      Hello {{current_user.firstname}}! <a href="{{ url_for('users.logout') }}" type="button" class="btn header-btn">Log
-        out</a>
-      <a href="{{ url_for('users.profileDisplay') }}" type="button" class="btn header-btn">
-        <i class="fa fa-user"></i> Profile
-      </a>
-      <a href="{{ url_for('productreviewpage.productreviewpagebackend') }}" type="button" class="btn header-btn">Reviews
-        of Products</a>
-      <a href="{{ url_for('sellerreviewpage.sellerreviewpagebackend') }}" type="button" class="btn header-btn">Reviews of
-        Sellers</a>
+      Hello {{current_user.firstname}}! 
       <a href="{{ url_for('carts.carts') }}" type="button" class="btn header-btn">
         Cart
       </a>
+      <a href="{{ url_for('users.profileDisplay') }}" type="button" class="btn header-btn">
+        <i class="fa fa-user"></i> Profile 
+      </a>
+      <a href="{{ url_for('users.logout') }}" type="button" class="btn header-btn">Log
+        out</a>
       {% else %}
       <a href="{{ url_for('users.login') }}" type="button" class="btn header-btn">Log in</a>
       {% endif %}

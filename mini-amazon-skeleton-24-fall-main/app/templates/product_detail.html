@@ -222,24 +222,6 @@
                 {% endif %}
 
                 <div class="product-meta">
-                    <p>
-                        <span>Category:</span>
-                        {{ Category.get_name(product.category_id) if product.category_id else "Uncategorized" }}
-                    </p>
-                    <p>
-                        <span>Seller ID: (Click for more info)</span>
-                        <a href="{{ url_for('users.pubPage', user_id=product.seller_id) }}" class="seller-link">{{product.seller_id }}</a>
-                    </p>
-
-                    <p>
-                        <span>Status:</span>
-                        {% if product.available and product.quantity is not none and product.quantity > 0 %}
-                        <span class="stock-available">{{ product.quantity }} in Stock</span>
-                        {% else %}
-                        <span class="stock-unavailable">Out of Stock</span>
-                        {% endif %}
-                    </p>
-
                     <div class="seller-section">
                         <h2>Available Sellers</h2>
                         <div>
