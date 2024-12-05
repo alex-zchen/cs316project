@@ -2,6 +2,7 @@ from flask import current_app as app
 
 
 class Product:
+    #Initialize product object
     def __init__(self, id, name, seller_id, price, available, description=None, category_id=None, image_url=None, avg_rating=None, review_count=None, quantity=None):
         self.id = id
         self.name = name
@@ -15,6 +16,7 @@ class Product:
         self.review_count = review_count
         self.quantity = quantity
 
+    #Get a product by ID
     @staticmethod
     def get(id):
         rows = app.db.execute('''
@@ -38,6 +40,7 @@ WHERE p.id = :id
                             id=id)
         return Product(*(rows[0])) if rows is not None else None
 
+    #Get all products
     @staticmethod
     def get_all(available=True):
         rows = app.db.execute('''
@@ -60,6 +63,7 @@ WHERE p.available = :available
                             available=available)
         return [Product(*row) for row in rows]
 
+    #Get all products by seller ID
     @staticmethod 
     def filter_by(seller_id, k = 10000):
         if seller_id:
@@ -163,6 +167,7 @@ LIMIT :k
         rows = app.db.execute(query, **params)
         return [Product(*row) for row in rows]
 
+    #Get the count of all products
     @staticmethod
     def get_filtered_count(search_query, category=None):
         query = '''
@@ -184,6 +189,7 @@ LIMIT :k
         count = app.db.execute(query, **params)
         return count[0][0]
 
+    #List a product
     @staticmethod
     def list_product(name, seller_id, price, description=None, category_id=None, image_url=None, quantity=1):
         try:
@@ -223,6 +229,7 @@ RETURNING id
             print(str(e))
             return None
 
+    #Return list of categories
     @staticmethod
     def get_all_categories():
         rows = app.db.execute('''
@@ -234,6 +241,7 @@ RETURNING id
         ''')
         return [(row[0], row[1]) for row in rows]  # Returns tuples of (id, name)
 
+    #Get the count of each product under specific criteria
     @staticmethod
     def get_filtered_count(search_query, category=None):
         query = 'SELECT COUNT(*) FROM Products WHERE 1=1'
@@ -250,6 +258,7 @@ RETURNING id
         count = app.db.execute(query, **params)
         return count[0][0]
 
+    #Get all sellers that have a given pid for sale
     @staticmethod
     def get_sellers(product_id):
         rows = app.db.execute('''

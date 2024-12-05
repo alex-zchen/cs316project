@@ -14,10 +14,12 @@ from .models.category import Category
 
 bp = Blueprint('products', __name__)
 
+#Form to take in review score to be posted
 class ProductReviewForm(FlaskForm):
     rscore = IntegerField('Review Score (1-5)', validators=[DataRequired()])
     submit = SubmitField('List Review')
 
+#Form to take in new review score to be posted
 class ChangeReviewForm(FlaskForm):
     rscore = IntegerField('Change Score (1-5)', validators=[DataRequired()])
     submit = SubmitField('List Review')
@@ -35,7 +37,7 @@ def product_list():
     # Get all available categories for the dropdown
     categories = Product.get_all_categories()
 
-    # Get filtered products
+    # Get filtered products based on given criteria
     products = Product.search_and_filter(
         search_query=search_query,
         sort_by=sort_by,
@@ -75,6 +77,7 @@ def product_detail(product_id):
     form = None
     purchased = False
     
+    #If a user has logged in and purchased a displayed product, allow them to review it or edit their reviews
     if current_user.is_authenticated:
         purchase_check = Purchase.if_purchased_item(current_user.id, product_id)
         purchased = purchase_check is not None
@@ -121,6 +124,7 @@ def product_detail(product_id):
                          Category=Category)
 
 
+#Allow users to update their cart
 @bp.route('/products/<int:product_id>/add_to_cart', methods=['POST'])
 @login_required
 def add_to_cart(product_id):
@@ -135,7 +139,7 @@ def add_to_cart(product_id):
     flash('Product added to cart successfully!', 'success')
     return redirect(url_for('products.product_detail', product_id=product_id))
 
-
+#Allow users to delete their reviews
 @bp.route('/products/<int:product_id>/delete_review', methods=['POST'])
 @login_required
 def delete_review(product_id):

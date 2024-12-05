@@ -5,6 +5,7 @@ from .models.cart import Cart
 
 bp = Blueprint('products', __name__)
 
+#Display all products for sale
 @bp.route('/products')
 def listproduct():
     seller_id = request.args.get('seller_id', type=int)
@@ -26,6 +27,7 @@ def listproduct():
         'available': product.available
     } for product in products])
 
+#Search for a given product by ID
 @bp.route('/product/<int:id>')
 def searchproduct(id):
     product = Product.get(id)

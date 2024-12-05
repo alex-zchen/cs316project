@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
+<!-- Styling for buttons, forms, and tables-->
 <style>
     .btn,
     button,
@@ -199,7 +200,9 @@
     }
 </style>
 
+<!-- Display product details, including seller information, reviews, and add to cart form-->
 <div class="container">
+    <!-- Display any flash messages-->
     {% with messages = get_flashed_messages() %}
     {% if messages %}
     {% for message in messages %}
@@ -212,6 +215,7 @@
 
     <div class="product-container">
         <div class="product-layout">
+            <!-- Display product image-->
             <div class="product-image">
                 {% if product.image_url %}
                 <a href="{{ url_for('products.product_detail', product_id=product.id) }}">
@@ -224,6 +228,7 @@
                 {% endif %}
             </div>
 
+            <!-- Display product details-->
             <div class="product-details">
                 <div class="product-id">
                     Product ID: {{ product.id }}
@@ -246,6 +251,7 @@
                 </div>
                 {% endif %}
 
+                <!-- Display all sellers that have the product for sale-->
                 <div class="product-meta">
                     <div class="seller-section">
                         <h2>Sellers</h2>
@@ -286,6 +292,7 @@
                         </div>
                     </div>
 
+                    <!-- Display all reviews that the user has posted-->
                     <div class="reviews-section">
                         <h2>Recent Reviews</h2>
                         

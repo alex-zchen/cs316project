@@ -16,7 +16,7 @@ from flask import current_app as app
 
 bp = Blueprint('sellerpage', __name__)
 
-
+#Form to take in product information to be listed as new products
 class ListForm(FlaskForm):
     product_name = StringField('Product Name', validators=[DataRequired()])
     price = IntegerField('Product Price', validators=[DataRequired()])
@@ -31,12 +31,14 @@ class ListForm(FlaskForm):
 def seller():
     form = ListForm()
     
-    # Populate category choices
+    # Get all categories on the site in dropdown
     categories = Category.get_all()
     form.category_id.choices = [(c.id, c.name) for c in categories]
     
+    #Also get the view type, default to current
     view_type = request.args.get('view', 'current')  # 'current' or 'sold'
     
+    #If the form is validated, list the product
     if form.validate_on_submit():
         if Product.list_product(
             form.product_name.data, 
@@ -49,9 +51,11 @@ def seller():
         ):
             flash("Product listed successfully!")
             return redirect(url_for('sellerpage.seller'))
+        #Otherwise, flash an error
         else: 
             flash("Error listing product")
     
+    #Get all products that the seller has for sale
     products = []
     if current_user.is_authenticated:
         if view_type == 'sold':
@@ -60,7 +64,8 @@ def seller():
         else:
             # Get current listings
             products = Product.filter_by(current_user.id)
-    
+
+    #Paginate all the seller's products
     page_size = 5 
     product_pages = []
 
@@ -71,11 +76,13 @@ def seller():
     if len(product_pages) == 0:
         product_pages = [[]]
 
+    #Display the final seller page
     return render_template('seller.html',
                          products_in_inventory=product_pages,
                          form=form,
                          view_type=view_type, user = current_user) 
 
+#Updates quantity of the product only if the quantity requested can be purchased with available stock
 @bp.route('/update_quantity/<int:product_id>', methods=['POST'])
 def update_quantity(product_id):
     new_quantity = request.form.get('new_quantity', type=int)
@@ -94,6 +101,7 @@ def update_quantity(product_id):
         flash('Invalid quantity value!')
     return redirect(url_for('sellerpage.seller')) 
 
+#Update fulfillment status of the product if seller has fulfilled the order
 @bp.route('/update_fulfillment/<int:purchase_id>', methods=['POST'])
 def update_fulfillment(purchase_id):
     app.db.execute("""

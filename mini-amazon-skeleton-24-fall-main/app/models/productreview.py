@@ -1,6 +1,5 @@
 from flask import current_app as app
 
-
 class AllReviews:
     def __init__(self, id, uid, pid, rscore, time_reviewed, for_seller):
         self.id = id

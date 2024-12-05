@@ -6,6 +6,7 @@ class Category:
         self.name = name
         self.description = description
 
+    #Get all categories
     @staticmethod
     def get_all():
         rows = app.db.execute('''
@@ -15,6 +16,7 @@ ORDER BY name
 ''')
         return [Category(*row) for row in rows]
 
+    #Get a category by ID
     @staticmethod
     def get(id):
         rows = app.db.execute('''
@@ -25,6 +27,7 @@ WHERE id = :id
                             id=id)
         return Category(*(rows[0])) if rows else None
 
+    #Get a category name by ID
     @staticmethod
     def get_name(id):
         category = Category.get(id)

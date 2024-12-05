@@ -4,6 +4,7 @@ from datetime import datetime
 now = str(datetime.now())
 
 class Purchase:
+    #Initialize purchase object
     def __init__(self, id, uid, pid, time_purchased, fulfilled, quantity, coupon_code=None):
         self.id = id
         self.uid = uid
@@ -14,6 +15,7 @@ class Purchase:
         self.coupon_code = coupon_code
 
     @staticmethod
+    #Get a purchase by ID
     def get(id):
         rows = app.db.execute('''
 SELECT id, uid, pid, time_purchased, fulfilled, quantity, coupon_code
@@ -45,6 +47,7 @@ WHERE id = :id
             uid=uid)
         return [Purchase(*row) for row in rows]
 
+    #Get all purchases by uid and sid
     @staticmethod
     def if_purchased(uid, sid):
         rows = app.db.execute('''
@@ -61,6 +64,7 @@ WHERE id = :id
             sid=sid)
         return [Purchase(*(rows[0]))] if rows else None
 
+    #Get all purchases by uid and pid
     @staticmethod
     def if_purchased_item(uid, pid):
         rows = app.db.execute('''
@@ -74,6 +78,7 @@ WHERE id = :id
             pid=pid)
         return [Purchase(*(rows[0]))]  if rows else None
       
+    #Add a purchase to the user's purhase history using pid. Optionally include coupon code
     @staticmethod
     def add_purchase(uid, pid, coupon_code=None):
         current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
@@ -92,6 +97,8 @@ RETURNING id
         except Exception as e:
             print(str(e))
             return None
+
+    #Get all products sold by a specific seller using their id
     @staticmethod
     def get_seller_sold_products(seller_id):
         rows = app.db.execute('''
@@ -103,6 +110,7 @@ RETURNING id
         ''', seller_id=seller_id)
         return rows
 
+    #Get all purchases by uid and timestamp
     @staticmethod
     def get_orders_by_time(uid, timestamp):
         rows = app.db.execute('''
