@@ -11,6 +11,7 @@ class Cart:
         self.quant = quant
         self.seller_id = seller_id
 
+    # Returns array of all cart items
     @staticmethod
     def get(uid):
         rows = app.db.execute('''
@@ -24,12 +25,14 @@ class Cart:
         else: 
             return {}
 
+    # Checks if cart is empty
     @staticmethod
     def isEmpty(uid):
         if Cart.get(current_user.id) == {}:
             return True
         else: return False
     
+    # Sums price of all products in cart
     @staticmethod
     def get_total_price(uid):
         if Cart.isEmpty(current_user.id) == True:
@@ -44,6 +47,7 @@ class Cart:
             uid=uid)
             return rows[0][0]
     
+    # Adds item to cart
     @staticmethod
     def addCart(uid, pid, quant, seller_id):
         try:
@@ -76,6 +80,7 @@ class Cart:
             print(f"Error adding to cart: {e}")
             return None
     
+    # Removes item from cart
     @staticmethod
     def remCart(uid, pid):
         rows = app.db.execute("""
@@ -86,6 +91,7 @@ class Cart:
         uid=uid, pid=pid)
         return Cart.get
 
+    # Increases quantity of item
     @staticmethod
     def upQuant(uid, pid, quant):
         rows = app.db.execute("""
@@ -96,6 +102,7 @@ class Cart:
                 uid=uid, pid=pid, quant=quant)
         return None
     
+    # Decreases quantity of item
     @staticmethod
     def lowQuant(uid, pid, quant):
         if(quant>1):
@@ -110,6 +117,7 @@ class Cart:
                 flash("Error: Could not decrease quantity")
         return None
 
+    # Applies coupon code to cart total price
     @staticmethod
     def apply_coupon(uid, code):
         try:
@@ -135,6 +143,7 @@ class Cart:
             print(f"Error applying coupon: {e}")
             return False
 
+    # Checks active discounts
     @staticmethod
     def get_active_discount(uid):
         try:
@@ -152,6 +161,7 @@ class Cart:
             print(f"Error getting discount: {e}")
             return None
 
+    # Buys cart, removes items from cart and adds to purchases
     @staticmethod
     def buy_cart(uid):
         current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')

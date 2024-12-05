@@ -33,7 +33,7 @@ def carts():
     # userid
     user_cart = {}
     userid = current_user.id
-    # find total price and cart:
+    # Find total price and cart:
     if(current_user.is_authenticated):
         user_cart = Cart.get(userid)
     total_price = Cart.get_total_price(userid)
@@ -55,7 +55,7 @@ def carts():
         return redirect(url_for('carts.carts'))
 
 
-    # render the page by adding information to the index.html file
+    # Render the page by adding information to the index.html file
     return render_template('carts.html',
                            ucart=user_cart,
                            total="{:.2f}".format(total_price), 
@@ -71,7 +71,7 @@ def delete(uid, pid):
     # userid
     user_cart = {}
     userid = current_user.id
-    # find total price and cart:
+    # Check if user is logged in
     if(current_user.is_authenticated):
         user_cart = Cart.get(userid)
     total_price = Cart.get_total_price(userid)
@@ -84,6 +84,7 @@ def delete(uid, pid):
             flash("Error: Could Not Remove Item From Cart")
             return redirect(url_for('carts.carts'))
 
+# Routes for increasing and decreasing quantity
 @bp.route('/plus/<int:pid>/<int:quant>', methods=['POST'])
 def plus(pid, quant):
     try:
@@ -100,6 +101,7 @@ def minus(pid, quant):
     except:
         return redirect(url_for('carts.carts'))
 
+# Apply coupon discount
 @bp.route('/apply_coupon', methods=['POST'])
 def apply_coupon():
     if not current_user.is_authenticated:
