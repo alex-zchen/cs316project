@@ -12,10 +12,6 @@ from .models.purchase import Purchase
 from .models.product import Product
 from .models.productreview import AllReviews
 from .models.sellerreview import SellerReviewReview
-import base64
-import io
-import matplotlib
-import matplotlib.pyplot as plt
 from flask import current_app as app
 from .sellerreviewpage import SellerReviewForm
 from werkzeug.security import generate_password_hash
@@ -59,6 +55,10 @@ def editInfo():
 #so current user is accurately updated (in accordance with the new DB object), and reloads their profile page.
 @bp.route('/updateInfo', methods = ["GET", "POST"])
 def updateInfo():
+    if(not current_user.is_authenticated):
+        flash('You must be logged in to view this page')
+        return redirect(url_for('products.product_list')) 
+    #get clean None or real value for all form fields
     try:
         fname = request.form.get('fname')
     except:
@@ -92,8 +92,8 @@ def updateInfo():
         if(not validateEmail(email)):
             flash('Update failed - invalid email')
             return redirect(url_for('users.editInfo'))
-       
-    
+
+    #Update current user object
     current_user.firstname = fname if fname else current_user.firstname
     current_user.lastname = lname if lname else current_user.lastname
     current_user.email = email if email else current_user.email
@@ -101,6 +101,7 @@ def updateInfo():
     current_user.address = address if address else current_user.address
     current_user.balance = balance if balance else current_user.balance
 
+    #Update user in db
     current_user.update_info(
         id=current_user.id, 
         email=current_user.email, 
@@ -112,6 +113,7 @@ def updateInfo():
     )
     login()    
     user = current_user
+    #Get all purchases for user
     purchases = Purchase.get_all_by_uid_since(uid = user.id, since = -1)
     
     # Group purchases by timestamp
@@ -138,24 +140,7 @@ def updateInfo():
     # Convert to list and sort by timestamp
     order_list = list(orders.values())
     order_list.sort(key=lambda x: x['timestamp'], reverse=True)
-    
-    # Create graph data object to show cumulative spend
-    graph_data = {
-        'x': [order['timestamp'] for order in order_list],
-        'y': [order['cumulative_total'] for order in order_list]
-    }
-    
-    #Generate and save a base64 encoded graph of the cumulative spend over time
-    plt.figure(figsize=(10, 5))
-    plt.plot(graph_data['x'], graph_data['y'], marker='o')
-    plt.xlabel('Date')
-    plt.ylabel('Spent ($)')
-    plt.title('Cumulative Purchases')
-    buf = io.BytesIO()
-    plt.savefig(buf, format='png')
-    graph_base64 = base64.b64encode(buf.getvalue()).decode('utf-8')
-    buf.close()
-    
+
     # Paginate orders with page size of 5
     page_size = 5 
     order_pages = []
@@ -166,11 +151,15 @@ def updateInfo():
     if len(order_pages) == 0:
         order_pages = [[]]
 
-    return render_template('profile.html', user=user, orders=order_pages, graph_data=graph_base64)
+    #Render final profile page
+    return render_template('profile.html', user=user, orders=order_pages)
 
 @bp.route("/profile", methods=["GET"]) 
 #Displays the profile page, showing their info (editable) and their previous purchases in reverse chronological order.
 def profileDisplay():
+    if(not current_user.is_authenticated):
+        flash('You must be logged in to view this page')
+        return redirect(url_for('products.product_list')) 
     user = current_user
     purchases = Purchase.get_all_by_uid_since(uid=user.id, since=-1)
     
@@ -208,23 +197,6 @@ def profileDisplay():
     order_list = list(orders.values())
     order_list.sort(key=lambda x: x['timestamp'], reverse=True)
     
-    # Create graph data object to show cumulative spend
-    graph_data = {
-        'x': [order['timestamp'] for order in order_list],
-        'y': [order['cumulative_total'] for order in order_list]
-    }
-    
-    #Generate and save a base64 encoded graph of the cumulative spend over time
-    plt.figure(figsize=(10, 5))
-    plt.plot(graph_data['x'], graph_data['y'], marker='o')
-    plt.xlabel('Date')
-    plt.ylabel('Spent ($)')
-    plt.title('We go above and beyond to make your account history transparent. \n Here is a graph of your cumulative spend over time.')
-    buf = io.BytesIO()
-    plt.savefig(buf, format='png')
-    graph_base64 = base64.b64encode(buf.getvalue()).decode('utf-8')
-    buf.close()
-    
     # Paginate orders with page size of 5
     page_size = 5 
     order_pages = []
@@ -235,13 +207,17 @@ def profileDisplay():
     if len(order_pages) == 0:
         order_pages = [[]]
 
-    return render_template('profile.html', user=user, orders=order_pages, graph_data=graph_base64)
+    return render_template('profile.html', user=user, orders=order_pages)
+
 
 #Log the user in by validating their email using password hashing (inspired by mini amazon skeleton).
 @bp.route('/login', methods=['GET', 'POST'])
 def login():
+    #If user is already logged in, redirect to products page
     if current_user.is_authenticated:
         return redirect(url_for('products.product_list'))
+    
+    #Otherwise display login form
     form = LoginForm()
     if form.validate_on_submit():
         user = User.get_by_auth(form.email.data, form.password.data)
@@ -359,6 +335,7 @@ def order_page(uid, timestamp):
             ''', code=purchase.coupon_code)[0][0]
             price = price * (1 - float(discount)/100)
         
+        #Build list of purchase objects for the user
         purchaseObj = {}
         purchaseObj['PurchaseDate'] = purchase.time_purchased
         purchaseObj["ProductName"] = product.name
@@ -370,6 +347,7 @@ def order_page(uid, timestamp):
         purchaseObj['Fulfillment_Status'] = "Not yet shipped" if not purchase.fulfilled else "Shipped"
         productPurchases.append(purchaseObj)
 
+    #Display all the purchases
     return render_template('order.html', 
                          purchases=productPurchases, 
                          timestamp=timestamp, 

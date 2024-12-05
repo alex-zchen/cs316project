@@ -27,6 +27,9 @@ class PromoForm(FlaskForm):
 
 @bp.route('/carts', methods=['GET', 'POST'])
 def carts():
+    if(not current_user.is_authenticated):
+        flash('You must be logged in to view this page')
+        return redirect(url_for('products.product_list')) 
     # userid
     user_cart = {}
     userid = current_user.id
