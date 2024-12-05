@@ -91,7 +91,7 @@ class User(UserMixin):
             lastname=lastname, 
             balance=balance, 
             # Don't hash the password again if it's already hashed
-            password=password if password.startswith('pbkdf2:sha256:') else generate_password_hash(password)
+            password=password
             )
             return True
         except Exception as e:
