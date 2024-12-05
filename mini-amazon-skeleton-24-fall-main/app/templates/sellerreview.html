@@ -1,5 +1,6 @@
 {% extends "base.html" %}
-
+<!-- not used -->
+<!-- page for seller reviews-->
 {% block content %}
 
 <style>
@@ -28,7 +29,7 @@
 
 {% if current_user.is_authenticated %}
 <br>
-
+<!-- filter seller reivews-->
 <form method="GET" action="">
     <div class="form-group">
         <label for="seller_id">Filter by Seller ID:</label>
@@ -39,7 +40,7 @@
     <a href="{{ url_for('sellerreviewpage.sellerreviewpagebackend') }}" class="btn btn-secondary">Clear Filter</a>
 </form>
 <br><br>
-
+<!-- list out seller reivews-->
 <h2>Your Reviews of Sellers:</h2>
 <table class='table table-hover table-bordered container'>
     <thead class="thead-dark">
@@ -57,11 +58,13 @@
             <td>{{review.sid}}</td>
             <td>{{review.rscore}}</td>
             <td>{{review.time_reviewed}}</td>
+            <!-- delete this review-->
             <td>
                 <form action="{{ url_for('sellerreviewpage.seller_delete', seller_id=review.sid) }}" method="POST">
                     <input type="submit" value="Delete" />
                 </form>
             </td>
+            <!-- change review needs value in input field-->
             <td>
                 <form action="{{ url_for('sellerreviewpage.seller_change', seller_id=review.sid) }}" method="POST">
                     <p>
@@ -88,7 +91,7 @@
 </div>
 
 <br><br>
-
+<!-- add reivew-->
 <form action="" method="post">
     {{ form.hidden_tag() }}
     <p>

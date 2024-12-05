@@ -9,6 +9,7 @@ class AllReviews:
         self.time_reviewed = time_reviewed
         self.for_seller = for_seller
 
+    #get product review by id
     @staticmethod
     def get(id):
         rows = app.db.execute("""
@@ -19,6 +20,7 @@ WHERE id = :id
                               id=id)
         return AllReviews(*(rows[0])) if rows is not None else None
 
+    #get all product reviews by user_id
     @staticmethod
     def get_all_by_uid(uid):
         rows = app.db.execute('''
@@ -30,6 +32,7 @@ ORDER BY time_reviewed DESC
                               uid=uid)
         return [AllReviews(*row) for row in rows] 
 
+    #get all product reviews by user_id for a seller
     @staticmethod
     def get_all_by_uid_for_sid(uid, seller_id):
         rows = app.db.execute('''
@@ -45,6 +48,7 @@ ORDER BY time_reviewed DESC
                               seller_id=seller_id)
         return [AllReviews(*row) for row in rows] 
 
+    #get all product review by user_id for product
     @staticmethod
     def get_all_by_uid_for_pid(uid, pid):
         rows = app.db.execute('''
@@ -59,6 +63,7 @@ ORDER BY time_reviewed DESC
                               pid=pid)
         return [AllReviews(*row) for row in rows] 
 
+    #check if product_id is reviewed by user_id
     @staticmethod
     def check_by_uid_for_pid(uid, pid):
         rows = app.db.execute('''
@@ -73,6 +78,7 @@ ORDER BY time_reviewed DESC
                               pid=pid)
         return rows if rows is not None else None
 
+    #get all product reviews
     @staticmethod
     def get_all_by_pid(pid):
         rows = app.db.execute('''
@@ -85,6 +91,7 @@ ORDER BY time_reviewed DESC
                               pid=pid)
         return [AllReviews(*row) for row in rows] 
 
+    # get all product reviews of a seller
     @staticmethod
     def get_all_by_seller_id(seller_id):
         rows = app.db.execute('''
@@ -98,6 +105,7 @@ ORDER BY time_reivewed DESC
                               seller_id=seller_id)
         return [AllReviews(*row) for row in rows] 
 
+    #add product review
     @staticmethod
     def reviewProduct(uid, pid, rscore, time_reviewed):
         try:
@@ -119,6 +127,7 @@ RETURNING id
             print(str(e))
             return None
 
+    #delete product review
     @staticmethod
     def delete_product_id(uid, pid):
         rows = app.db.execute('''
@@ -129,6 +138,7 @@ AND uid = :uid
                               uid=uid,
                               pid=pid)
 
+    #update review
     @staticmethod
     def update_rscore(uid, pid, rscore, time_reviewed):
         rows = app.db.execute('''
@@ -142,6 +152,7 @@ AND uid = :uid
                               rscore=rscore,
                               time_reviewed=time_reviewed)
 
+    #get product reivews with reviews first and last name
     @staticmethod
     def get_product_reviews(pid):
         rows = app.db.execute('''

@@ -10,6 +10,7 @@ class SellerReviewReview:
         self.time_reviewed = time_reviewed
         self.for_seller = for_seller
 
+    #get review by id
     @staticmethod
     def get(id):
         rows = app.db.execute("""
@@ -20,6 +21,7 @@ WHERE id = :id
                               id=id)
         return SellerReviewReview(*(rows[0])) if rows is not None else None
 
+    #get all reviews by user_id
     @staticmethod
     def get_all_by_uid(uid):
         rows = app.db.execute('''
@@ -31,6 +33,7 @@ ORDER BY time_reviewed DESC
                               uid=uid)
         return [SellerReviewReview(*row) for row in rows] 
 
+    #get reviews by user_id and a seller
     @staticmethod
     def get_all_by_uid_for_sid(uid, sid):
         rows = app.db.execute('''
@@ -45,6 +48,7 @@ ORDER BY time_reviewed DESC
                               sid=sid)
         return [SellerReviewReview(*row) for row in rows] 
 
+    #check if review by user_id for seller exists else None
     @staticmethod
     def check_by_uid_for_sid(uid, sid):
         rows = app.db.execute('''
@@ -59,6 +63,7 @@ ORDER BY time_reviewed DESC
                               sid=sid)
         return rows if rows is not None else None
 
+    #get all review for seller
     @staticmethod
     def get_all_by_sid(sid):
         rows = app.db.execute('''
@@ -71,6 +76,7 @@ ORDER BY time_reviewed DESC
                               sid=sid)
         return [SellerReviewReview(*row) for row in rows] 
 
+    #get all reviews for a product based on id
     @staticmethod
     def get_all_by_product_id(sid):
         rows = app.db.execute('''
@@ -84,6 +90,7 @@ ORDER BY time_reivewed DESC
                               sid=sid)
         return [SellerReviewReview(*row) for row in rows] 
 
+    #add seller review
     @staticmethod
     def reviewSeller(uid, sid, rscore, time_reviewed):
         try:
@@ -105,6 +112,7 @@ RETURNING id
             print(str(e))
             return None
 
+    #delete the review
     @staticmethod
     def delete_seller_id(uid, sid):
         rows = app.db.execute('''
@@ -115,6 +123,7 @@ AND uid = :uid
                               uid=uid,
                               sid=sid)
 
+    #update review
     @staticmethod
     def update_rscore(uid, sid, rscore, time_reviewed):
         rows = app.db.execute('''

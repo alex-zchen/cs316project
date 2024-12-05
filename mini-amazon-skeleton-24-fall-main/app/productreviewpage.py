@@ -17,20 +17,27 @@ from datetime import datetime
 from flask import Blueprint
 bp = Blueprint('productreviewpage', __name__)
 
+#old version instead productpage.py
+
+#form for making first product review
 class ProductReviewForm(FlaskForm):
     product_name = IntegerField('Product ID', validators=[DataRequired()])
     rscore = IntegerField('Review Score (1-5)', validators=[DataRequired()])
     submit = SubmitField('List Review')
 
+#form for changing product review
 class ChangeReviewForm(FlaskForm):
     rscore = IntegerField('Change Score (1-5)', validators=[DataRequired()])
 
+#old version
+#get all product reviews and handles buttons
 @bp.route('/productreviewpage', methods=['GET', 'POST'])
 def productreviewpagebackend():
     product_id = request.args.get('product_id')
     form = ProductReviewForm()
     if form.validate_on_submit():
         if current_user.is_authenticated:
+            #check if between 1 and 5 or if already made review
             if (form.rscore.data>=0 and form.rscore.data<=5) and (len(AllReviews.check_by_uid_for_pid(current_user.id, form.product_name.data)) ==0):
                 if AllReviews.reviewProduct(current_user.id, 
                                 form.product_name.data, form.rscore.data, 
@@ -65,6 +72,8 @@ def productreviewpagebackend():
                             previews=previewsPages,
                             form=form)
 
+#still used
+#delete product review
 @bp.route('/productreviewpage/delete/<int:product_id>', methods=['POST'])
 def product_delete(product_id):
     if current_user.is_authenticated:
@@ -73,7 +82,8 @@ def product_delete(product_id):
     else:
         return jsonfiy({}), 404
 
-
+#still used
+#change a product review
 @bp.route('/productreviewpage/change/<int:product_id>', methods=['POST'])
 def product_change(product_id):
     form = ChangeReviewForm()

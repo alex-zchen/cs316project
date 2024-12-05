@@ -1,4 +1,6 @@
 {% extends "base.html" %}
+<!-- not used -->
+<!-- page for product reivew-->
 
 {% block content %}
 <!-- Styling for pagination, buttons, and forms-->
@@ -41,7 +43,7 @@
 
 {% if current_user.is_authenticated %}
 <br>
-
+<!-- filter by products id-->
 <form method="GET" action="">
     <div class="form-group">
         <label for="product_id">Filter by Product ID:</label>
@@ -52,8 +54,7 @@
     <a href="{{ url_for('productreviewpage.productreviewpagebackend') }}" class="btn btn-secondary">Clear Filter</a>
 </form>
 <br><br>
-
-<!-- Display all reviews that the user has posted-->
+<!-- list reivews -->
 <h2>Your Reviews of Products:</h2>
 <table class='table table-hover table-bordered container'>
     <thead class="thead-dark">
@@ -71,11 +72,13 @@
             <td>{{review.pid}}</td>
             <td>{{review.rscore}}</td>
             <td>{{review.time_reviewed}}</td>
+            <!-- delete review-->
             <td>
                 <form action="{{ url_for('productreviewpage.product_delete', product_id=review.pid) }}" method="POST">
                     <input type="submit" value="Delete" />
                 </form>
             </td>
+            <!-- change reivew -->
             <td>
                 <form action="{{ url_for('productreviewpage.product_change', product_id=review.pid) }}" method="POST">
                     <p>
@@ -102,8 +105,12 @@
 </div>
 
 <br><br>
+<<<<<<< HEAD
 
 <!-- Form to take in product ID and review score to be posted-->
+=======
+<!-- make review -->
+>>>>>>> 5029d1788763431feebd8eb79f91e9c2102b2cbc
 <form action="" method="post">
     {{ form.hidden_tag() }}
     <p>
