@@ -78,7 +78,7 @@ def productreviewpagebackend():
 def product_delete(product_id):
     if current_user.is_authenticated:
         AllReviews.delete_product_id(current_user.id, product_id)
-        return redirect(url_for('productreviewpage.productreviewpagebackend'))
+        return redirect(url_for('users.user_reviews'))
     else:
         return jsonfiy({}), 404
 
