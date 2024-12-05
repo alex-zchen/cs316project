@@ -153,7 +153,7 @@ LIMIT :k
         elif sort_by == 'rating':
             query += f' ORDER BY avg_rating {sort_order}'
         else:
-            query += f' ORDER BY p.id {sort_order}'
+            query += f' ORDER BY avg_rating {sort_order}'
 
         # Add pagination
         query += ' LIMIT :per_page OFFSET :offset'
