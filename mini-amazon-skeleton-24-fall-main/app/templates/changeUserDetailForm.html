@@ -2,13 +2,15 @@
 
 {% block content %}
 
+<!-- Stylings for form -->
 <style>
   .form-container {
       margin-top: 20px;
   }
 </style>
-
+<!-- Display Update Form -->
 <div class="form-container">
+  <!-- Allow flash -->
   {% with messages = get_flashed_messages() %}
     {% if messages %}
     {% for message in messages %}
@@ -21,8 +23,10 @@
 <form action="{{ url_for('users.updateInfo') }}" method="POST">
   {{ form.hidden_tag() }}
   <p>
+    <!-- Display question and form -->
     {{ form.fname.label }}<br/>
     {{ form.fname(size=32) }}<br/>
+    <!-- Display errors as needed -->
     {% for error in form.fname.errors %}
     <span style="color: red;">[{{ error }}]</span>
     {% endfor %}
@@ -63,6 +67,7 @@
     <span style="color: red;">[{{ error }}]</span>
     {% endfor %}
   </p>
+    <!-- Allow submission -->
   <p><button type="submit">Update Information</button></p>
 </form>
 </div>
