@@ -2,6 +2,9 @@
 Project Repo for Fall 2024 CS316
 Standard Amazon Database
 
+### Final Project Link:
+https://www.youtube.com/watch?v=A791gZHa2UM
+
 ### Team Name: Banana Pudding
 Alexander Chen - Users
 Harry Fazzone - Products
