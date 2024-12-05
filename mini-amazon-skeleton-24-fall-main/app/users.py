@@ -71,7 +71,7 @@ def updateInfo():
         password = None
 
     try:
-        balance = request.form.get('balance')
+        balance = float(request.form.get('balance'))
     except:
         balance = None
 

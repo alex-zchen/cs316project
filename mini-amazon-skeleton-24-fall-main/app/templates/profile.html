@@ -2,6 +2,7 @@
 {% block content %}
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <title>{{ user.firstname }}'s Profile</title>
     <!-- Stylings for user info tables -->
@@ -10,26 +11,32 @@
             width: 50%;
             margin-top: 20px;
         }
+
         .table-container {
             margin-left: 5%;
             margin-top: 2%;
             display: flex;
             gap: 10%;
         }
+
         .profile-table {
             margin-top: 20px;
         }
+
         .user-info {
             width: 60%;
         }
+
         .purchases {
             width: 30%;
         }
+
         .pagination {
             margin-top: 15px;
             justify-content: left;
             gap: 10px;
         }
+
         .page-button {
             padding: 2px 10px;
             border: 1px solid #000000;
@@ -41,6 +48,7 @@
             align-items: center;
             justify-content: center;
         }
+
         .active-page {
             background-color: #007bff;
             color: white;
@@ -48,17 +56,18 @@
         }
     </style>
 </head>
+
 <body>
     <!-- Display user name/welcome them to profile page-->
     <h1 style="margin-top: 5%; margin-left: 5%;">Hello {{ user.firstname }}!</h1>
     <!--Link to public profile page-->
-    <p style="margin-left: 5%;"> You're on your profile page. If you want to access your seller page, 
+    <p style="margin-left: 5%;"> You're on your profile page. If you want to access your seller page,
         <a href="{{ url_for('sellerpage.seller') }}">click here</a>.
         If you want to see your public page, <a href="{{ url_for('users.pubPage', user_id=user.id) }}">click here</a>.
     </p>
     <!-- Add this after the user info table but before the orders table -->
     <p style="margin-left: 5%;">
-        View and manage your reviews: 
+        View and manage your reviews:
         <a href="{{ url_for('users.user_reviews') }}">My Reviews</a>
     </p>
     <!--Table for user info-->
@@ -72,8 +81,8 @@
             </thead>
             <tbody>
                 <tr></tr>
-                    <td>Account Number</td>
-                    <td>{{ user.id }}</td>
+                <td>Account Number</td>
+                <td>{{ user.id }}</td>
                 </tr>
                 <tr>
                     <td>First Name</td>
@@ -120,8 +129,8 @@
                         <td>{{ order.count }} items</td>
                         <td>${{ "%.2f"|format(order.total) }}</td>
                         <td>
-                            <a href="{{ url_for('users.order_page', uid=order.uid, timestamp=order.timestamp) }}" 
-                               class="btn btn-primary btn-sm">View Details</a>
+                            <a href="{{ url_for('users.order_page', uid=order.uid, timestamp=order.timestamp) }}"
+                                class="btn btn-primary btn-sm">View Details</a>
                         </td>
                     </tr>
                     {% else %}
@@ -133,8 +142,8 @@
             </table>
             <div class="pagination">
                 {% for i in range(orders|length) %}
-                <a href="{{ url_for('users.profileDisplay', page=i) }}" 
-                   class="page-button {% if i == request.args.get('page', 0)|int %}active-page{% endif %}">
+                <a href="{{ url_for('users.profileDisplay', page=i) }}"
+                    class="page-button {% if i == request.args.get('page', 0)|int %}active-page{% endif %}">
                     {{ i + 1 }}
                 </a>
                 {% endfor %}
@@ -142,6 +151,7 @@
         </div>
     </div>
 </body>
+
 </html>
 <div style="text-align: center; margin: 20px;">
     <img src="data:image/png;base64,{{ graph_data }}" alt="Purchase History Graph">
