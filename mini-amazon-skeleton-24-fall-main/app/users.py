@@ -4,6 +4,8 @@ from flask_login import login_user, logout_user, current_user
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, DecimalField
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo
+from wtforms import Form, StringField
+from wtforms.validators import Email
 from datetime import datetime
 from .models.user import User
 from .models.purchase import Purchase
@@ -16,10 +18,18 @@ import matplotlib
 import matplotlib.pyplot as plt
 from flask import current_app as app
 from .sellerreviewpage import SellerReviewForm
-
+from werkzeug.security import generate_password_hash
 from flask import Blueprint
+
+
 bp = Blueprint('users', __name__)
 
+def validateEmail(email_string):
+    class TempForm(Form):
+        email = StringField('Email', validators=[Email()])
+    
+    form = TempForm(email=email_string)
+    return form.email.validate(form)
 
 #Form for logging users in, including email, password and remember me option. Inspired by mini amazon skeleton.
 class LoginForm(FlaskForm):
@@ -31,7 +41,7 @@ class LoginForm(FlaskForm):
 #Update info form for users to change log in info, includes validation and password hashing, and when submitted replaces user data in db
 #and logs them back in. 
 class UpdateInfoForm(FlaskForm):
-    email = StringField('Email')
+    email = StringField('Email', validators=[Email()])
     address = StringField('Address')
     password = PasswordField('Password')
     fname = StringField('First Name')
@@ -75,12 +85,22 @@ def updateInfo():
     except:
         balance = None
 
+    if(email):
+        if(User.email_exists(email)):
+            flash('Update failed - email already exists')
+            return redirect(url_for('users.editInfo'))
+        if(not validateEmail(email)):
+            flash('Update failed - invalid email')
+            return redirect(url_for('users.editInfo'))
+       
+    
     current_user.firstname = fname if fname else current_user.firstname
     current_user.lastname = lname if lname else current_user.lastname
     current_user.email = email if email else current_user.email
     current_user.password = generate_password_hash(password) if password else current_user.password
     current_user.address = address if address else current_user.address
     current_user.balance = balance if balance else current_user.balance
+
     current_user.update_info(
         id=current_user.id, 
         email=current_user.email, 

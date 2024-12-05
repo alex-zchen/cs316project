@@ -25,6 +25,7 @@ class PromoForm(FlaskForm):
     discount = StringField('Coupon Code')
     submit = SubmitField('Update')
 
+# route for main cart page
 @bp.route('/carts', methods=['GET', 'POST'])
 def carts():
     # userid
@@ -67,6 +68,7 @@ def carts():
                             length = len(user_cart),
                             names = [Product.get(i.pid).name for i in user_cart])
 
+# route for deleting items in cart
 @bp.route('/delete/<int:uid>/<int:pid>', methods=['POST'])
 def delete(uid, pid):
     # userid
@@ -85,6 +87,7 @@ def delete(uid, pid):
             flash("Error: Could Not Remove Item From Cart")
             return redirect(url_for('carts.carts'))
 
+# route for increasing quantity
 @bp.route('/plus/<int:pid>/<int:quant>', methods=['POST'])
 def plus(pid, quant):
     try:
@@ -93,6 +96,7 @@ def plus(pid, quant):
     except:
         return redirect(url_for('carts.carts'))
 
+# route for decreasing quantity
 @bp.route('/minus/<int:pid>/<int:quant>', methods=['POST'])
 def minus(pid, quant):
     try: 
@@ -101,6 +105,7 @@ def minus(pid, quant):
     except:
         return redirect(url_for('carts.carts'))
 
+# route for applying coupon codes for discounts
 @bp.route('/apply_coupon', methods=['POST'])
 def apply_coupon():
     if not current_user.is_authenticated:

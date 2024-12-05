@@ -11,6 +11,7 @@ class Cart:
         self.quant = quant
         self.seller_id = seller_id
 
+    # returns array of cart items for html implementation
     @staticmethod
     def get(uid):
         rows = app.db.execute('''
@@ -24,12 +25,14 @@ class Cart:
         else: 
             return {}
 
+    # checks if cart is empty
     @staticmethod
     def isEmpty(uid):
         if Cart.get(current_user.id) == {}:
             return True
         else: return False
     
+    # returns total price of cart (all items price added)
     @staticmethod
     def get_total_price(uid):
         if Cart.isEmpty(current_user.id) == True:
@@ -44,6 +47,7 @@ class Cart:
             uid=uid)
             return rows[0][0]
     
+    # adds item to cart
     @staticmethod
     def addCart(uid, pid, quant, seller_id):
         try:
@@ -76,6 +80,7 @@ class Cart:
             print(f"Error adding to cart: {e}")
             return None
     
+    # removes items from cart
     @staticmethod
     def remCart(uid, pid):
         rows = app.db.execute("""
@@ -86,6 +91,7 @@ class Cart:
         uid=uid, pid=pid)
         return Cart.get
 
+    # increases quantity of specified item in cart
     @staticmethod
     def upQuant(uid, pid, quant):
         rows = app.db.execute("""
@@ -96,6 +102,7 @@ class Cart:
                 uid=uid, pid=pid, quant=quant)
         return None
     
+    # decreases quantity of specified item in cart
     @staticmethod
     def lowQuant(uid, pid, quant):
         if(quant>1):
@@ -110,6 +117,7 @@ class Cart:
                 flash("Error: Could not decrease quantity")
         return None
 
+    # applies coupon code for sales
     @staticmethod
     def apply_coupon(uid, code):
         try:
@@ -135,6 +143,7 @@ class Cart:
             print(f"Error applying coupon: {e}")
             return False
 
+    # checks if coupon code is active
     @staticmethod
     def get_active_discount(uid):
         try:
@@ -152,6 +161,7 @@ class Cart:
             print(f"Error getting discount: {e}")
             return None
 
+    # removes items from cart and adds to purchases 
     @staticmethod
     def buy_cart(uid):
         current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
