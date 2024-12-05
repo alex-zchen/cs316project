@@ -55,6 +55,9 @@ def editInfo():
 #so current user is accurately updated (in accordance with the new DB object), and reloads their profile page.
 @bp.route('/updateInfo', methods = ["GET", "POST"])
 def updateInfo():
+    if(not current_user.is_authenticated):
+        flash('You must be logged in to view this page')
+        return redirect(url_for('products.product_list')) 
     #get clean None or real value for all form fields
     try:
         fname = request.form.get('fname')
@@ -154,6 +157,9 @@ def updateInfo():
 @bp.route("/profile", methods=["GET"]) 
 #Displays the profile page, showing their info (editable) and their previous purchases in reverse chronological order.
 def profileDisplay():
+    if(not current_user.is_authenticated):
+        flash('You must be logged in to view this page')
+        return redirect(url_for('products.product_list')) 
     user = current_user
     purchases = Purchase.get_all_by_uid_since(uid=user.id, since=-1)
     
@@ -202,6 +208,7 @@ def profileDisplay():
         order_pages = [[]]
 
     return render_template('profile.html', user=user, orders=order_pages)
+
 
 #Log the user in by validating their email using password hashing (inspired by mini amazon skeleton).
 @bp.route('/login', methods=['GET', 'POST'])
