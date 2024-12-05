@@ -83,6 +83,17 @@
   <div class="main">
     {% block content %}{% endblock %}
   </div>
+  <script>
+    window.onload = function() {
+        if (window.history.length > 1) {
+            window.history.pushState(null, null, window.location.href);
+            window.onpopstate = function() {
+                window.history.pushState(null, null, window.location.href);
+                window.location.href = "{{ url_for('users.login') }}";  // Redirect to login
+            };
+        }
+    };
+  </script>
 </body>
 
 

@@ -212,40 +212,42 @@
 
     <div class="product-container">
         <div class="product-layout">
+<!--book image-->
             <div class="product-image">
                 {% if product.image_url %}
                 <a href="{{ url_for('products.product_detail', product_id=product.id) }}">
                     <img src="{{ product.image_url }}" alt="{{ product.name }}">
                 </a>
                 {% else %}
+<!--alternate text-->
                 <div class="no-image">
                     <span>No image available</span>
                 </div>
                 {% endif %}
             </div>
-
+<!--p id-->
             <div class="product-details">
                 <div class="product-id">
-                    Product ID: {{ product.id }}
+                    Product ID: {{ product.id }} 
                 </div>
-
+<!--p name-->
                 <h1 class="product-name">{{ product.name }}</h1>
 
                 <div class="product-price">${{ "%.2f"|format(product.price) }}</div>
-
+<!--avg rating and review count-->
                 <div>
                     <span>
                         {{ product.avg_rating }} stars ({{ product.review_count }} reviews)
                     </span>
                 </div>
-
+<!--description-->
                 {% if product.description %}
                 <div class="product-description">
                     <h2>Description</h2>
                     <p>{{ product.description }}</p>
                 </div>
                 {% endif %}
-
+<!--list of sellers-->
                 <div class="product-meta">
                     <div class="seller-section">
                         <h2>Sellers</h2>
@@ -254,6 +256,7 @@
                             <div class="seller-card {% if seller.is_original_seller %}original-seller{% endif %}">
                                 <div class="seller-info">
                                     <div>
+<!--whose listing is it-->
                                         {% if seller.is_original_seller %}
                                         <strong class="original-seller-badge">Original Seller</strong>
                                         {% endif %}
@@ -285,7 +288,7 @@
                             {% endfor %}
                         </div>
                     </div>
-
+<!--reviews-->
                     <div class="reviews-section">
                         <h2>Recent Reviews</h2>
                         
@@ -301,7 +304,7 @@
                                 </form>
                             {% endif %}
                         {% endif %}
-
+<!--reviewers stuff from joeseph-->
                         {% if reviews %}
                             <div>
                                 <p>Average Rating: {{ "%.1f"|format(product.avg_rating) }} / 5.0 ({{ product.review_count }} reviews)</p>
