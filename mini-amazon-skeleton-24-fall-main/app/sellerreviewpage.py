@@ -18,14 +18,20 @@ from datetime import datetime
 from flask import Blueprint
 bp = Blueprint('sellerreviewpage', __name__)
 
+#old version instead user.py pubPag
+
+#form for making first seller review
 class SellerReviewForm(FlaskForm):
     seller_name = IntegerField('Seller ID', validators=[DataRequired()])
     rscore = IntegerField('Review Score', validators=[DataRequired()])
     submit = SubmitField('List Review')
 
+#form for changing seller review
 class ChangeReviewForm(FlaskForm):
     rscore = IntegerField('Change Score (1-5)', validators=[DataRequired()])
 
+#old version
+#get all seller reviews and enable buttons to make review
 @bp.route('/sellerreviewpage', methods=['GET', 'POST'])
 def sellerreviewpagebackend():
     seller_id = request.args.get('seller_id')
@@ -68,6 +74,8 @@ def sellerreviewpagebackend():
                             sreviews=sreviewsPages,
                             form=form)
 
+#still used
+#delete seller review
 @bp.route('/sellerreviewpage/delete/<int:seller_id>', methods=['POST'])
 def seller_delete(seller_id):
     if current_user.is_authenticated:
@@ -76,7 +84,8 @@ def seller_delete(seller_id):
     else:
         return jsonfiy({}), 404
 
-
+#still used
+#change review
 @bp.route('/sellerreviewpage/change/<int:seller_id>', methods=['POST'])
 def seller_change(seller_id):
     form = ChangeReviewForm()
@@ -120,6 +129,8 @@ def seller_review_from_public(seller_id):
     
     return redirect(url_for('users.pubPage', user_id=seller_id))
 
+#latest version
+#delete seller review for public page
 @bp.route('/seller_delete_from_public/<int:seller_id>', methods=['POST'])
 def seller_delete_from_public(seller_id):
     if current_user.is_authenticated:
@@ -127,12 +138,15 @@ def seller_delete_from_public(seller_id):
         flash('Review deleted successfully!')
     return redirect(url_for('users.pubPage', user_id=seller_id))
 
+#latest version
+#change seller review for public page
 @bp.route('/seller_change_from_public/<int:seller_id>', methods=['POST'])
 def seller_change_from_public(seller_id):
     if not current_user.is_authenticated:
         flash('Please log in to update your review.')
         return redirect(url_for('users.pubPage', user_id=seller_id))
     
+    #check if between 1 and 5
     rscore = request.form.get('rscore')
     if not rscore or not (1 <= int(rscore) <= 5):
         flash('Please provide a valid rating between 1 and 5.')

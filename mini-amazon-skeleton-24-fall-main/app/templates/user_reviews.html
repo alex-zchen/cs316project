@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-
+<!-- page for all reviews shown -->
 {% block content %}
 <div class="container mt-4">
     <h2>My Reviews</h2>
@@ -20,6 +20,7 @@
                 {% for review in reviews %}
                 <tr>
                     <td>{{ review.time_reviewed.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                    <!-- change action between productreview and sellerreview-->
                     <td>
                         {% if review.for_seller %}
                             Seller Review
