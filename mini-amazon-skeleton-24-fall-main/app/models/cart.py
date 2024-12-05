@@ -11,7 +11,7 @@ class Cart:
         self.quant = quant
         self.seller_id = seller_id
 
-    #Get all items in cart
+    # Returns array of all cart items
     @staticmethod
     def get(uid):
         rows = app.db.execute('''
@@ -25,14 +25,14 @@ class Cart:
         else: 
             return {}
 
-    #Check if cart is empty
+    # Checks if cart is empty
     @staticmethod
     def isEmpty(uid):
         if Cart.get(current_user.id) == {}:
             return True
         else: return False
     
-    #Get total price of items in cart
+    # Sums price of all products in cart
     @staticmethod
     def get_total_price(uid):
         if Cart.isEmpty(current_user.id) == True:
@@ -47,7 +47,7 @@ class Cart:
             uid=uid)
             return rows[0][0]
     
-    #Add an item to cart using pid, uid, quant and seller_id
+    # Adds item to cart
     @staticmethod
     def addCart(uid, pid, quant, seller_id):
         try:
@@ -80,7 +80,7 @@ class Cart:
             print(f"Error adding to cart: {e}")
             return None
     
-    #Remove an item from cart using uid and pid
+    # Removes item from cart
     @staticmethod
     def remCart(uid, pid):
         rows = app.db.execute("""
@@ -91,7 +91,7 @@ class Cart:
         uid=uid, pid=pid)
         return Cart.get
 
-    #Increase quant of item
+    # Increases quantity of item
     @staticmethod
     def upQuant(uid, pid, quant):
         rows = app.db.execute("""
@@ -101,7 +101,8 @@ class Cart:
                 """,
                 uid=uid, pid=pid, quant=quant)
         return None
-    #Decrease quant of item
+    
+    # Decreases quantity of item
     @staticmethod
     def lowQuant(uid, pid, quant):
         if(quant>1):
@@ -116,7 +117,7 @@ class Cart:
                 flash("Error: Could not decrease quantity")
         return None
 
-    #Apply a coupon to the cart
+    # Applies coupon code to cart total price
     @staticmethod
     def apply_coupon(uid, code):
         try:
@@ -142,7 +143,7 @@ class Cart:
             print(f"Error applying coupon: {e}")
             return False
 
-    #Get the active discount for the user
+    # Checks active discounts
     @staticmethod
     def get_active_discount(uid):
         try:
@@ -160,7 +161,7 @@ class Cart:
             print(f"Error getting discount: {e}")
             return None
 
-    #Buy all items in cart
+    # Buys cart, removes items from cart and adds to purchases
     @staticmethod
     def buy_cart(uid):
         current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')

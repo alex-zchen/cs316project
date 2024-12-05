@@ -23,7 +23,7 @@ class ProductReviewForm(FlaskForm):
 class ChangeReviewForm(FlaskForm):
     rscore = IntegerField('Change Score (1-5)', validators=[DataRequired()])
     submit = SubmitField('List Review')
-
+#all products
 @bp.route('/', methods=['GET', 'POST'])
 def product_list():
     # Get search and filter parameters
@@ -34,7 +34,7 @@ def product_list():
     page = request.args.get('page', 1, type=int)
     per_page = 4
 
-    # Get all available categories for the dropdown
+    # dropdown for categories
     categories = Product.get_all_categories()
 
     # Get filtered products based on given criteria
@@ -47,7 +47,7 @@ def product_list():
         per_page=per_page
     )
 
-    # Get total count for pagination
+    # pagination count
     total_products = Product.get_filtered_count(search_query, category)
     total_pages = math.ceil(total_products / per_page)
 
@@ -61,7 +61,7 @@ def product_list():
                          category=category,
                          categories=categories)
 
-
+#product detail page info
 @bp.route('/products/<int:product_id>', methods=['GET', 'POST'])
 def product_detail(product_id):
     product = Product.get(product_id)
@@ -76,20 +76,19 @@ def product_detail(product_id):
     
     form = None
     purchased = False
-    
-    #If a user has logged in and purchased a displayed product, allow them to review it or edit their reviews
+    #logged in on p details
     if current_user.is_authenticated:
         purchase_check = Purchase.if_purchased_item(current_user.id, product_id)
         purchased = purchase_check is not None
         
-        if purchased:
+        if purchased:# can user review
             existing_review = AllReviews.check_by_uid_for_pid(current_user.id, product_id)
             if existing_review:
                 form = ChangeReviewForm()
             else:
                 form = ProductReviewForm()
                 
-            if form.validate_on_submit():
+            if form.validate_on_submit(): #reviews stuff from joseph
                 rscore = form.rscore.data
                 if 1 <= rscore <= 5:
                     try:
@@ -123,8 +122,7 @@ def product_detail(product_id):
                          form=form,
                          Category=Category)
 
-
-#Allow users to update their cart
+#if user is logged in then they can add to cart
 @bp.route('/products/<int:product_id>/add_to_cart', methods=['POST'])
 @login_required
 def add_to_cart(product_id):
@@ -139,7 +137,7 @@ def add_to_cart(product_id):
     flash('Product added to cart successfully!', 'success')
     return redirect(url_for('products.product_detail', product_id=product_id))
 
-#Allow users to delete their reviews
+#delete user review
 @bp.route('/products/<int:product_id>/delete_review', methods=['POST'])
 @login_required
 def delete_review(product_id):

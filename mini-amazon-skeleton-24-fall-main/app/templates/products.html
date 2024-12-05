@@ -132,7 +132,7 @@
     {% endif %}
     {% endwith %}
 
-    <!-- Search and Filter Form -->
+    <!-- serach/filter form -->
     <form method="GET" action="{{ url_for('products.product_list') }}" class="mb-8">
         <div class="flex flex-wrap gap-4">
             <div class="flex-1">
@@ -167,7 +167,7 @@
         </div>
     </form>
 
-    <!-- Products Grid -->
+    <!-- Main Grid-->
     <div class="product-grid">
         {% for product in products %}
         <div class="product-card">
