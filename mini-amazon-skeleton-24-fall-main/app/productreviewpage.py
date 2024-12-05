@@ -17,14 +17,20 @@ from datetime import datetime
 from flask import Blueprint
 bp = Blueprint('productreviewpage', __name__)
 
+#old version of product review page instead productpage.py
+
+#form fomr input and button fields of making review
 class ProductReviewForm(FlaskForm):
     product_name = IntegerField('Product ID', validators=[DataRequired()])
     rscore = IntegerField('Review Score (1-5)', validators=[DataRequired()])
     submit = SubmitField('List Review')
 
+#form for input field of changing review
 class ChangeReviewForm(FlaskForm):
     rscore = IntegerField('Change Score (1-5)', validators=[DataRequired()])
 
+#old version
+#page for all reviews of products
 @bp.route('/productreviewpage', methods=['GET', 'POST'])
 def productreviewpagebackend():
     product_id = request.args.get('product_id')
@@ -65,6 +71,8 @@ def productreviewpagebackend():
                             previews=previewsPages,
                             form=form)
 
+#still used
+#delete  product review
 @bp.route('/productreviewpage/delete/<int:product_id>', methods=['POST'])
 def product_delete(product_id):
     if current_user.is_authenticated:
@@ -73,7 +81,8 @@ def product_delete(product_id):
     else:
         return jsonfiy({}), 404
 
-
+#still used
+#change the product review
 @bp.route('/productreviewpage/change/<int:product_id>', methods=['POST'])
 def product_change(product_id):
     form = ChangeReviewForm()

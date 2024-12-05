@@ -18,14 +18,19 @@ from datetime import datetime
 from flask import Blueprint
 bp = Blueprint('sellerreviewpage', __name__)
 
+#old version of sellerpage instead user.py pubPag
+
+#for input and button field of making first review
 class SellerReviewForm(FlaskForm):
     seller_name = IntegerField('Seller ID', validators=[DataRequired()])
     rscore = IntegerField('Review Score', validators=[DataRequired()])
     submit = SubmitField('List Review')
 
+#for input chaging already made review
 class ChangeReviewForm(FlaskForm):
     rscore = IntegerField('Change Score (1-5)', validators=[DataRequired()])
 
+#old version of reviewpage made by seller
 @bp.route('/sellerreviewpage', methods=['GET', 'POST'])
 def sellerreviewpagebackend():
     seller_id = request.args.get('seller_id')
@@ -68,6 +73,8 @@ def sellerreviewpagebackend():
                             sreviews=sreviewsPages,
                             form=form)
 
+#still used
+#delete seller reivew
 @bp.route('/sellerreviewpage/delete/<int:seller_id>', methods=['POST'])
 def seller_delete(seller_id):
     if current_user.is_authenticated:
@@ -76,7 +83,8 @@ def seller_delete(seller_id):
     else:
         return jsonfiy({}), 404
 
-
+#still used
+#change seller reivew
 @bp.route('/sellerreviewpage/change/<int:seller_id>', methods=['POST'])
 def seller_change(seller_id):
     form = ChangeReviewForm()
@@ -120,6 +128,8 @@ def seller_review_from_public(seller_id):
     
     return redirect(url_for('users.pubPage', user_id=seller_id))
 
+#most recent on public page
+#delete seller review
 @bp.route('/seller_delete_from_public/<int:seller_id>', methods=['POST'])
 def seller_delete_from_public(seller_id):
     if current_user.is_authenticated:
@@ -127,6 +137,8 @@ def seller_delete_from_public(seller_id):
         flash('Review deleted successfully!')
     return redirect(url_for('users.pubPage', user_id=seller_id))
 
+#most recent on public page
+#change seller review
 @bp.route('/seller_change_from_public/<int:seller_id>', methods=['POST'])
 def seller_change_from_public(seller_id):
     if not current_user.is_authenticated:
