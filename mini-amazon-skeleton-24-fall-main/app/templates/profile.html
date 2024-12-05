@@ -4,7 +4,7 @@
 <html lang="en">
 <head>
     <title>{{ user.firstname }}'s Profile</title>
-    <!-- Stylings for user info tables -->
+    <!-- Styles for profile page -->
     <style>
         .profile-table {
             width: 50%;
@@ -51,12 +51,12 @@
 <body>
     <!-- Display user name/welcome them to profile page-->
     <h1 style="margin-top: 5%; margin-left: 5%;">Hello {{ user.firstname }}!</h1>
-    <!--Link to public profile page-->
+    <!--Link to public seller profile-->
     <p style="margin-left: 5%;"> You're on your profile page. If you want to access your seller page, 
         <a href="{{ url_for('sellerpage.seller') }}">click here</a>.
         If you want to see your public page, <a href="{{ url_for('users.pubPage', user_id=user.id) }}">click here</a>.
     </p>
-    <!-- Add this after the user info table but before the orders table -->
+    <!-- Display user's reviews of sellers-->
     <p style="margin-left: 5%;">
         View and manage your reviews: 
         <a href="{{ url_for('users.user_reviews') }}">My Reviews</a>
@@ -99,7 +99,7 @@
                 </tr>
             </tbody>
         </table>
-        <!--Table for user purchases-->
+        <!--Table for user purchases, displaying date, item, payment-->
         <div class="col">
             <h2 style="font-size: 1.5rem; font-family: 'Playfair Display';">Your Orders</h2>
             <table class="table profile-table">
