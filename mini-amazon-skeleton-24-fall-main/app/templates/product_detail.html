@@ -259,7 +259,6 @@
                             <div class="seller-card {% if seller.is_original_seller %}original-seller{% endif %}">
                                 <div class="seller-info">
                                     <div>
-<!--whose listing is it-->
                                         {% if seller.is_original_seller %}
                                         <strong class="original-seller-badge">Original Seller</strong>
                                         {% endif %}
@@ -278,7 +277,7 @@
                                             {% endif %}
                                         </p>
                                     </div>
-                                    {% if seller.quantity > 0 and current_user.is_authenticated %}
+                                    {% if seller.is_original_seller and seller.quantity > 0 and current_user.is_authenticated %}
                                     <form action="{{ url_for('products.add_to_cart', product_id=product.id, seller_id=seller.seller_id) }}" method="POST">
                                         <input type="number" name="quantity" value="1" min="1" max="{{ seller.quantity }}" class="quantity-input">
                                         <button type="submit">Add to Cart</button>
